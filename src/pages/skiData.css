@@ -1,0 +1,56 @@
+/* glaciers.css
+   Styling for glacier popups, toggle button, and integration with GLOFmap styles.
+*/
+
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+/* Popup container styling */
+.ski-popup .mapboxgl-popup-content {
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: white;
+  padding: 12px;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Resort name */
+.ski-popup .mapboxgl-popup-content h4 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Stats container */
+.ski-popup .stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* Each stat block */
+.ski-popup .stats div {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Highlighted value */
+.ski-popup .stats div strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+/* Popup tip color */
+.ski-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.65) !important;
+}

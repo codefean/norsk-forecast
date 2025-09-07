@@ -31,6 +31,10 @@ export const frostToGeoJSON = (stations) => {
         name: station.name || "Unnamed Station",
         shortName: station.shortName || "Unknown",
         country: station.country || "Norway",
+
+        // ✅ Include glacier metadata if available
+        closestGlacier: station.closestGlacier || null,
+        distanceToGlacierKm: station.distanceToGlacierKm ?? null,
       },
     }));
 

@@ -1,24 +1,43 @@
+/* ----------------------------- */
+/* Imports */
+/* ----------------------------- */
 @import 'mapbox-gl/dist/mapbox-gl.css';
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
-
+/* ----------------------------- */
 /* Base Styles */
+/* ----------------------------- */
 body {
   margin: 0;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f7fa;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
 .no-scroll {
   overflow: hidden;
   height: 100%;
 }
 
+/* ----------------------------- */
+/* Map Container & Wrapper */
+/* ----------------------------- */
+.weather-map-wrapper {
+  position: relative;
+}
+
+.map-container {
+  width: 100%;
+  height: 100vh;
+}
+
+/* Ensure crosshair cursor on map by default */
 .mapboxgl-canvas {
   cursor: crosshair !important;
 }
@@ -27,102 +46,116 @@ code {
   cursor: crosshair !important;
 }
 
-/* ================================
-   Loading Overlay Container
-================================ */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  color: #00b3ff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  font-family: monospace;
-  padding: 20px;
+/* Allow hover-based pointer for interactive layers */
+.mapboxgl-canvas.crosshair {
+  cursor: pointer !important;
 }
 
-/* Title */
-.loading-title {
-  margin-bottom: 16px;
-  font-size: 20px;
-}
-
-/* ================================
-   Progress Bar
-================================ */
-.progress-container {
-  width: 80%;
-  height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  margin-bottom: 16px;
+/* ----------------------------- */
+/* Cluster Popups — Glacier Style */
+/* ----------------------------- */
+.cluster-popup .mapboxgl-popup-content {
   overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background-color: #00b3ff;
-  transition: width 0.3s ease-in-out;
-}
-
-.progress-percent {
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-
-/* ================================
-   Log Messages
-================================ */
-.log-messages {
-  max-height: 300px;
-  overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  padding: 12px 16px;
-  width: 80%;
-  font-size: 14px;
-  text-align: left;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: white;
+  padding: 12px;
+  font-family: "Open Sans", "Inter", sans-serif;
 }
 
-.log-message {
-  margin-bottom: 6px;
+.cluster-popup .mapboxgl-popup-content h4 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
 }
 
-/* Scrollbar Styling */
-.log-messages::-webkit-scrollbar {
-  width: 8px;
+.cluster-popup .mapboxgl-popup-content p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #fff;
 }
 
-.log-messages::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+/* Glacier list inside cluster popup */
+.cluster-popup .mapboxgl-popup-content ul {
+  padding-left: 18px;
+  margin: 4px 0 0;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
-.log-messages::-webkit-scrollbar-thumb {
-  background-color: #00ffcc;
-  border-radius: 10px;
+.cluster-popup .mapboxgl-popup-content li {
+  font-size: 0.85rem;
+  line-height: 1.3rem;
+  color: #fff;
+  list-style-type: circle;
 }
 
-/* ================================
-   Animations
-================================ */
-@keyframes pulse {
-  0% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.8;
-  }
+
+/* ----------------------------- */
+/* Individual Station Popups */
+/* ----------------------------- */
+.mapboxgl-popup-content {
+  font-family: "Open Sans", "Inter", sans-serif;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 10px 12px;
+  color: #fff;
 }
 
-.loading-title {
-  animation: pulse 1.5s infinite ease-in-out;
+.mapboxgl-popup-content strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ----------------------------- */
+/* Citation Component Positioning */
+/* ----------------------------- */
+.citation-readout {
+  position: absolute;
+  right: 12px;
+  bottom: 25px;
+  z-index: 2;
+}
+
+/* ----------------------------- */
+/* Cluster Layer Hover Effects */
+/* ----------------------------- */
+.mapboxgl-canvas-container:hover {
+  cursor: pointer;
+}
+
+/* Smooth hover on cluster circles */
+.mapboxgl-marker:hover,
+.mapboxgl-circle:hover {
+  filter: brightness(1.3);
+  transition: filter 0.2s ease;
+}
+
+/* ----------------------------- */
+/* Zoom Button Styling */
+/* ----------------------------- */
+.zoom-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 10px;
+  background-color: #00d4ff;
+  color: #000;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.zoom-btn:hover {
+  background-color: #00a7cc;
+  color: #fff;
+  transform: scale(1.05);
 }

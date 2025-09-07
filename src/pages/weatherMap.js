@@ -9,7 +9,6 @@ import Loc from "./loc";
 import Citation from "./citation";
 import "./weatherMap.css";
 
-
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
 
@@ -27,7 +26,6 @@ const WeatherStationsMap = () => {
   const [logMessages, setLogMessages] = useState([]);
   const [progress, setProgress] = useState(0);
 
-  // Utility: log messages + update progress bar
   const updateProgress = (msg, step, totalSteps) => {
     console.log(msg);
     setLogMessages((prev) => [...prev, msg]);
@@ -147,9 +145,13 @@ const WeatherStationsMap = () => {
         new mapboxgl.Popup()
           .setLngLat(coords)
           .setHTML(`
-            <strong>${props.name}</strong><br/>
-            ID: ${props.id || "N/A"}<br/>
-            Land: ${props.country || "Ukjent"}
+            <div style="font-size: 14px;">
+              <strong>${props.name}</strong><br/>
+              <em>Land:</em> ${props.country || "Ukjent"}<br/>
+              <em>ID:</em> ${props.id || "N/A"}<br/><br/>
+              <em>🧊 Nærmeste isbre:</em> <strong>${props.closestGlacier || "Ukjent"}</strong><br/>
+              <em>📏 Avstand:</em> ${props.distanceToGlacierKm || "?"} km
+            </div>
           `)
           .addTo(mapRef.current);
       });
@@ -174,7 +176,7 @@ const WeatherStationsMap = () => {
       <div
         ref={mapContainer}
         className="map-container"
-        style={{ width: "100%", height: "100vh"}}
+        style={{ width: "100%", height: "100vh" }}
       />
 
       {loading && (
