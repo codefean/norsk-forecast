@@ -15,9 +15,10 @@ export const glacierTileset2 = {
   sourceId: "glaciers_svalbard",
 };
 
-// ✅ Export layer IDs so we can reuse them in findClosestGlacier.js
+// ✅ Export layer IDs so we can reuse them
 export const FILL_LAYER_ID_1 = "glacier-fill-scandi";
 export const FILL_LAYER_ID_2 = "glacier-fill-svalbard";
+const HIGHLIGHT_LAYER_ID = "glacier-hover-highlight";
 
 // 🔹 Helper: Get glacier name or fallback to GLIMS ID
 const getGlacierLabel = (props = {}) => {
@@ -65,6 +66,21 @@ export function useGlacierLayer({ mapRef }) {
       map.setLayoutProperty(FILL_LAYER_ID_1, "visibility", "visible");
       map.setLayoutProperty(FILL_LAYER_ID_2, "visibility", "visible");
 
+      // 🔹 Add highlight layer on top
+      if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
+        map.addLayer({
+          id: HIGHLIGHT_LAYER_ID,
+          type: "fill",
+          source: glacierTileset.sourceId,
+          "source-layer": glacierTileset.sourceLayer,
+          paint: {
+            "fill-color": "#004d80", // darker blue
+            "fill-opacity": 0.7,
+          },
+          filter: ["==", "glims_id", ""], // initially, no glacier highlighted
+        });
+      }
+
       // Styled popup on hover
       const popup = new mapboxgl.Popup({
         closeButton: false,
@@ -79,11 +95,19 @@ export function useGlacierLayer({ mapRef }) {
         });
 
         if (!features.length) {
+          // Clear highlight if no glacier under cursor
+          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
           popup.remove();
           return;
         }
 
-        const props = features[0].properties;
+        const feature = features[0];
+        const props = feature.properties;
+
+        // ✅ Highlight hovered glacier
+        if (props?.glims_id) {
+          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", props.glims_id]);
+        }
 
         // ✅ Use glacier name OR fall back to GLIMS ID
         const glacLabel = getGlacierLabel(props);
@@ -117,8 +141,15 @@ export function useGlacierLayer({ mapRef }) {
         popup.setLngLat(e.lngLat).setHTML(popupHTML).addTo(map);
       });
 
-      map.on("mouseleave", FILL_LAYER_ID_1, () => popup.remove());
-      map.on("mouseleave", FILL_LAYER_ID_2, () => popup.remove());
+      // On leaving glacier area → remove highlight + popup
+      map.on("mouseleave", FILL_LAYER_ID_1, () => {
+        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+        popup.remove();
+      });
+      map.on("mouseleave", FILL_LAYER_ID_2, () => {
+        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+        popup.remove();
+      });
     };
 
     if (map.isStyleLoaded()) {

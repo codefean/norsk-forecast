@@ -9,6 +9,7 @@ import Loc from "./loc";
 import Citation from "./citation";
 import "./weatherMap.css";
 import { findClosestGlacier } from "./findClosestGlacier";
+import LoadingOverlay from "./loading";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -192,22 +193,14 @@ mapRef.current.on("click", "stations-layer", (e) => {
         style={{ width: "100%", height: "100vh" }}
       />
 
-      {loading && (
-        <div className="loading-overlay">
-          <h2 className="loading-title">🔄 Loading Glacier Data...</h2>
-          <div className="progress-container">
-            <div className="progress-bar" style={{ width: `${progress}%` }}></div>
-          </div>
-          <p className="progress-percent">{progress}% Complete</p>
-          <div className="log-messages">
-            {logMessages.map((msg, idx) => (
-              <div key={idx} className="log-message">
-                {msg}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+{loading && (
+  <LoadingOverlay
+    loading={loading}
+    progress={progress}
+    logMessages={logMessages}
+    title="🔄 Loading Glacier & Weather Station Data..."
+  />
+)}
 
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation
