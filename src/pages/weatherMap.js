@@ -10,6 +10,8 @@ import Citation from "./citation";
 import "./weatherMap.css";
 import { findClosestGlacier } from "./findClosestGlacier";
 import LoadingOverlay from "./loading";
+import { getStationDataSummary } from "./dataSummary";
+import { buildStationPopupHTML } from "./stationPopup";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -53,6 +55,7 @@ const WeatherStationsMap = () => {
       await new Promise((resolve) => mapRef.current.on("load", resolve));
       updateProgress("🛰️ Mapbox map fully loaded", step++, totalSteps);
 
+      // Add terrain source if missing
       if (!mapRef.current.getSource("mapbox-dem")) {
         mapRef.current.addSource("mapbox-dem", {
           type: "raster-dem",
@@ -63,6 +66,7 @@ const WeatherStationsMap = () => {
         mapRef.current.setTerrain({ source: "mapbox-dem", exaggeration: 1.0 });
       }
 
+      // Fetch stations
       updateProgress("🔄 Fetching Frost stations...", step, totalSteps);
       const stations = await fetchStations();
       updateProgress(`📦 Stations fetched: ${stations.length}`, step++, totalSteps);
@@ -73,15 +77,26 @@ const WeatherStationsMap = () => {
         return;
       }
 
+      // Filter allowed countries
       const allowedCountries = ["Sverige", "Norge", "Svalbard og Jan Mayen"];
       const filteredStations = stations.filter((station) =>
         allowedCountries.includes(station.country?.trim())
       );
-      updateProgress(`📌 Showing ${filteredStations.length} stations after filtering by country`, step++, totalSteps);
+      updateProgress(
+        `📌 Showing ${filteredStations.length} stations after filtering by country`,
+        step++,
+        totalSteps
+      );
 
+      // Convert to GeoJSON
       const stationPoints = frostToGeoJSON(filteredStations);
-      updateProgress(`✅ Converted ${stationPoints.features.length} valid stations into GeoJSON.`, step++, totalSteps);
+      updateProgress(
+        `✅ Converted ${stationPoints.features.length} valid stations into GeoJSON.`,
+        step++,
+        totalSteps
+      );
 
+      // Filter by proximity to glaciers
       updateProgress("🧊 Filtering stations near glaciers...", step, totalSteps);
       const stationsOnGlaciers = await filterFrostStations(stationPoints, 10);
       updateProgress(
@@ -90,16 +105,19 @@ const WeatherStationsMap = () => {
         totalSteps
       );
 
+      // Create GeoJSON blob
       const blob = new Blob([JSON.stringify(stationsOnGlaciers)], {
         type: "application/json",
       });
       const url = URL.createObjectURL(blob);
 
+      // Add station source if missing
       if (!mapRef.current.getSource("stations")) {
         mapRef.current.addSource("stations", { type: "geojson", data: url });
         updateProgress("📡 Glacier-filtered GeoJSON source added successfully", step, totalSteps);
       }
 
+      // Add station layer if missing
       if (!mapRef.current.getLayer("stations-layer")) {
         mapRef.current.addLayer({
           id: "stations-layer",
@@ -124,6 +142,7 @@ const WeatherStationsMap = () => {
         updateProgress("✅ Station layer added successfully", totalSteps, totalSteps);
       }
 
+      // Show elevation under cursor
       mapRef.current.on("mousemove", (e) => {
         const { lng, lat } = e.lngLat;
         const elevation = mapRef.current.queryTerrainElevation(e.lngLat, {
@@ -140,35 +159,74 @@ const WeatherStationsMap = () => {
         setCursorInfo({ lat: null, lng: null, elevM: null });
       });
 
-mapRef.current.on("click", "stations-layer", (e) => {
-  const props = e.features[0].properties;
-  const coords = e.features[0].geometry.coordinates;
+      // Handle station clicks
+      mapRef.current.on("click", "stations-layer", async (e) => {
+        const features = mapRef.current.queryRenderedFeatures(e.point, {
+          layers: ["stations-layer"],
+        });
+        if (!features || !features.length) return;
 
-  // 🔍 Find nearest glacier using MBTiles data
-  const { name: closestGlacier, distanceKm } = findClosestGlacier(
-    mapRef.current,
-    coords,
-    50 // optional search radius in km
-  );
+        const props = features[0].properties;
+        const coords = features[0].geometry.coordinates;
 
-  console.log(
-    `📌 Station: ${props.name}, Closest Glacier: ${closestGlacier}, Distance: ${distanceKm} km`
-  );
+        // Find nearest glacier
+        const { name: closestGlacier, distanceKm } = findClosestGlacier(
+          mapRef.current,
+          coords,
+          50
+        );
 
-  new mapboxgl.Popup()
-    .setLngLat(coords)
-    .setHTML(`
-      <div style="font-size: 14px;">
-        <strong>${props.name}</strong><br/>
-        <em>Land:</em> ${props.country || "Ukjent"}<br/>
-        <em>ID:</em> ${props.id || "N/A"}<br/><br/>
-        <em>🧊 Nærmeste isbre:</em> <strong>${closestGlacier}</strong><br/>
-        <em>📏 Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
-      </div>
-    `)
-    .addTo(mapRef.current);
-});
+        // Base popup HTML (always shown)
+        const baseHTML = `
+          <div style="font-size: 14px;">
+            <strong>${props?.name || "Ukjent stasjon"}</strong><br/>
+            <em>Land:</em> ${props?.country || "Ukjent"}<br/>
+            <em>ID:</em> ${props?.id || "N/A"}<br/><br/>
+            <em>🧊 Nærmeste isbre:</em> <strong>${closestGlacier || "Ukjent"}</strong><br/>
+            <em>📏 Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
+          </div>
+        `;
 
+        // Initial popup with loading state
+        const popup = new mapboxgl.Popup()
+          .setLngLat(coords)
+          .setHTML(`${baseHTML}<div style="margin-top:10px;">🔄 Laster værdata...</div>`)
+          .addTo(mapRef.current);
+
+        try {
+          // Fetch summary with timeout safeguard
+          const summary = await Promise.race([
+            getStationDataSummary(props.id),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Timeout")), 8000)
+            ),
+          ]);
+
+          if (summary) {
+            popup.setHTML(`
+              ${baseHTML}
+              <div style="margin-top:10px;">
+                ${buildStationPopupHTML(summary)}
+              </div>
+            `);
+          } else {
+            popup.setHTML(`
+              ${baseHTML}
+              <div style="margin-top:10px; color: gray;">
+                Ingen værdata tilgjengelig.
+              </div>
+            `);
+          }
+        } catch (err) {
+          console.error(`❌ Failed to fetch weather data for station ${props?.id}:`, err);
+          popup.setHTML(`
+            ${baseHTML}
+            <div style="margin-top:10px; color: red;">
+              ❌ Kunne ikke laste værdata.
+            </div>
+          `);
+        }
+      });
 
       setLoading(false);
     };
@@ -193,14 +251,14 @@ mapRef.current.on("click", "stations-layer", (e) => {
         style={{ width: "100%", height: "100vh" }}
       />
 
-{loading && (
-  <LoadingOverlay
-    loading={loading}
-    progress={progress}
-    logMessages={logMessages}
-    title="🔄 Loading Glacier & Weather Station Data..."
-  />
-)}
+      {loading && (
+        <LoadingOverlay
+          loading={loading}
+          progress={progress}
+          logMessages={logMessages}
+          title="🔄 Loading Glacier & Weather Station Data..."
+        />
+      )}
 
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation
