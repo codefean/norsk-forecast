@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { fetchStations } from "./frostAPI";
+import { fetchStations} from "./frostAPI";
 import { frostToGeoJSON } from "./geojsonUtils";
 import { useGlacierLayer } from "./glaciers";
 import { filterFrostStations } from "./filterFrost";
@@ -10,8 +10,9 @@ import Citation from "./citation";
 import "./weatherMap.css";
 import { findClosestGlacier } from "./findClosestGlacier";
 import LoadingOverlay from "./loading";
-import { getStationDataSummary } from "./dataSummary";
+import { getStationDataSummary } from "./frostAPI";
 import { buildStationPopupHTML } from "./stationPopup";
+import PitchControl from "./PitchControl";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -20,12 +21,26 @@ const WeatherStationsMap = () => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
 
+  const DEFAULT_PITCH = 20;
+  const [pitch, setPitch] = useState(DEFAULT_PITCH);
   const [cursorInfo, setCursorInfo] = useState({
     lat: null,
     lng: null,
     elevM: null,
   });
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
 
+    const sync = () => setPitch(map.getPitch());
+    map.on('pitch', sync);
+    map.on('pitchend', sync);
+
+    return () => {
+      map.off('pitch', sync);
+      map.off('pitchend', sync);
+    };
+  }, []);
   const [loading, setLoading] = useState(true);
   const [logMessages, setLogMessages] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -49,7 +64,8 @@ const WeatherStationsMap = () => {
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
         center: [10.75, 67.91],
-        zoom: 3.7,
+        pitch: DEFAULT_PITCH,
+        zoom: 4.7,
       });
 
       await new Promise((resolve) => mapRef.current.on("load", resolve));
@@ -176,56 +192,55 @@ const WeatherStationsMap = () => {
           50
         );
 
-        // Base popup HTML (always shown)
-        const baseHTML = `
-          <div style="font-size: 14px;">
-            <strong>${props?.name || "Ukjent stasjon"}</strong><br/>
-            <em>Land:</em> ${props?.country || "Ukjent"}<br/>
-            <em>ID:</em> ${props?.id || "N/A"}<br/><br/>
-            <em>🧊 Nærmeste isbre:</em> <strong>${closestGlacier || "Ukjent"}</strong><br/>
-            <em>📏 Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
-          </div>
-        `;
+const baseHTML = `
+  <div style="font-size: 14px;">
+    <strong>${props?.name || "Ukjent stasjon"}</strong><br/>
+    <em>Land:</em> ${props?.country || "Ukjent"}<br/>
+    <em>ID:</em> ${props?.id || "N/A"}<br/><br/>
+    <em>🧊 Nærmeste isbre:</em> <strong>${closestGlacier || "Ukjent"}</strong><br/>
+    <em>📏 Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
+  </div>
+`;
 
-        // Initial popup with loading state
-        const popup = new mapboxgl.Popup()
-          .setLngLat(coords)
-          .setHTML(`${baseHTML}<div style="margin-top:10px;">🔄 Laster værdata...</div>`)
-          .addTo(mapRef.current);
+// Initial popup while loading
+const popup = new mapboxgl.Popup({ className: "station-popup" })
+  .setLngLat(coords)
+  .setHTML(`${baseHTML}<div style="margin-top:10px;">🔄 Laster værdata...</div>`)
+  .addTo(mapRef.current);
 
-        try {
-          // Fetch summary with timeout safeguard
-          const summary = await Promise.race([
-            getStationDataSummary(props.id),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("Timeout")), 8000)
-            ),
-          ]);
+try {
+  // Fetch station summary with timeout safeguard
+  const summary = await Promise.race([
+    getStationDataSummary(props.id),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), 8000)
+    ),
+  ]);
 
-          if (summary) {
-            popup.setHTML(`
-              ${baseHTML}
-              <div style="margin-top:10px;">
-                ${buildStationPopupHTML(summary)}
-              </div>
-            `);
-          } else {
-            popup.setHTML(`
-              ${baseHTML}
-              <div style="margin-top:10px; color: gray;">
-                Ingen værdata tilgjengelig.
-              </div>
-            `);
-          }
-        } catch (err) {
-          console.error(`❌ Failed to fetch weather data for station ${props?.id}:`, err);
-          popup.setHTML(`
-            ${baseHTML}
-            <div style="margin-top:10px; color: red;">
-              ❌ Kunne ikke laste værdata.
-            </div>
-          `);
-        }
+  if (summary) {
+    popup.setHTML(`
+      ${baseHTML}
+      <div style="margin-top:10px;">
+        ${await buildStationPopupHTML(summary)}
+      </div>
+    `);
+  } else {
+    popup.setHTML(`
+      ${baseHTML}
+      <div style="margin-top:10px; color: gray;">
+        Ingen værdata tilgjengelig.
+      </div>
+    `);
+  }
+} catch (err) {
+  console.error(`❌ Failed to fetch weather data for station ${props?.id}:`, err);
+  popup.setHTML(`
+    ${baseHTML}
+    <div style="margin-top:10px; color: red;">
+      ❌ Kunne ikke laste værdata.
+    </div>
+  `);
+}
       });
 
       setLoading(false);
@@ -259,7 +274,7 @@ const WeatherStationsMap = () => {
           title="🔄 Loading Glacier & Weather Station Data..."
         />
       )}
-
+      <PitchControl mapRef={mapRef} value={pitch} onChange={(p) => setPitch(p)} />
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation
         className="citation-readout"

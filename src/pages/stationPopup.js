@@ -1,88 +1,96 @@
-// stationPopup.js
-// Builds the HTML content for a station's popup based on summary data `s`.
-
-// Tiny helpers for formatting
-const pct = (v) => (v == null ? "—" : `${Math.round(v)}%`);
-
-const badge = (text, tone = "neutral") =>
-  `<span style="
-    display:inline-block;
-    padding:2px 6px;
-    border-radius:999px;
-    font-size:12px;
-    line-height:1;
-    background:${
-      tone === "good"
-        ? "#e6f4ea"
-        : tone === "warn"
-        ? "#fef3c7"
-        : tone === "bad"
-        ? "#fee2e2"
-        : "#eef2f7"
-    };
-    color:${
-      tone === "good"
-        ? "#05603a"
-        : tone === "warn"
-        ? "#92400e"
-        : tone === "bad"
-        ? "#991b1b"
-        : "#334155"
-    };
-    border:1px solid ${
-      tone === "good"
-        ? "#b7e4c7"
-        : tone === "warn"
-        ? "#fde68a"
-        : tone === "bad"
-        ? "#fecaca"
-        : "#e5e7eb"
-    };
-  ">${text}</span>`;
+import { fetchLatestObservations } from "./frostAPI";
+import "./stationPopup.css";
 
 /**
- * Builds station popup HTML.
- * @param {object} s - Station data summary
- * @returns {string} HTML markup
+ * Dynamically builds popup HTML for a weather station.
+ * Shows whatever latest observations are available.
  */
-export function buildStationPopupHTML(s) {
-  const normalsBasisLabel = s.display.normalsBasis || "—"; // e.g. "Daily normals"
+export async function buildStationPopupHTML(station) {
+  let latestData;
+  try {
+    latestData = await fetchLatestObservations(station.stationId);
+  } catch (err) {
+    console.error("❌ Failed to fetch latest observations:", err);
+    latestData = { latest: {} };
+  }
+
+  const observations = latestData.latest || {};
+
+  const observationHTML = Object.entries(observations)
+    .map(([key, val]) => {
+      if (!val || typeof val !== "object" || val.value === undefined) return "";
+
+      const label = formatLabel(key);
+      const unit = normalizeUnit(val.unit);
+
+      return `
+        <div>
+          <strong>${val.value}${unit}</strong>
+          ${label}
+        </div>
+      `;
+    })
+    .join("");
 
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <div><strong>Nåværende temperatur</strong><br>${s.display.currentTemp}</div>
-      <div><strong>Nåværende nedbør</strong><br>${s.display.currentPrecip}</div>
-      <div><strong>5-års snitt (måned) – temp</strong><br>${s.display.avgTempThisMonth5yr}</div>
-      <div><strong>5-års sum (måned) – nedbør</strong><br>${s.display.avgPrecipThisMonth5yr}</div>
-    </div>
+    <div class="station-popup">
+      <h4>${station.name || "Ukjent stasjon"}</h4>
+      <div><em>Land:</em> ${station.country || "Ukjent"}</div>
+      <div><em>ID:</em> ${station.stationId || "N/A"}</div>
 
-    <div style="border-top:1px solid #eee;margin:10px 0"></div>
-
-    <!-- MTD block simplified -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><strong>${s.year} MTD snitt-temp</strong><br>${s.display.avgTempThisMonthThisYear}</div>
-      <div><strong>Normal MTD temp</strong><br>${s.display.normalTempThisMonth || "—"}
-        <div style="margin-top:2px;font-size:12px;color:#64748b">${normalsBasisLabel}</div>
+      <!-- Latest available observations -->
+      <div class="stats" style="margin-top:10px;">
+        ${observationHTML || "<em>Ingen tilgjengelige observasjoner</em>"}
       </div>
-      <div><strong>${s.year} MTD nedbør</strong><br>${s.display.avgPrecipThisMonthThisYear}
-        <div style="margin-top:4px">
-          <span style="margin-right:6px"><em>Normal MTD:</em> ${s.display.normalPrecipThisMonth || "—"}</span>
-        </div>
-      </div>
-    </div>
 
-    <div style="border-top:1px solid #eee;margin:10px 0"></div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><strong>Vind</strong><br>${s.display.wind}</div>
-      <div><strong>Følt temperatur</strong><br>${s.display.windChill}</div>
-      <div><strong>Luftfuktighet</strong><br>${s.display.humidity}</div>
-      <div><strong>Snødybde</strong><br>${s.display.snowDepth}</div>
-      <div><strong>Nedbør (24 t)</strong><br>${s.display.precip24h}</div>
-      <div><strong>Min / maks i dag</strong><br>${s.display.todayTempMin} / ${s.display.todayTempMax}</div>
-      <div style="grid-column:1/3;color:#666;margin-top:4px">
-        Siste observasjon: ${s.lastObsTime ? new Date(s.lastObsTime).toISOString() : "—"}
+      <!-- Last updated timestamp -->
+      <div class="footer" style="margin-top:12px; font-size:0.8rem; color:#ccc;">
+        <em>Siste observasjon:</em>
+        ${getLastObsTime(observations) || "—"}
       </div>
     </div>
   `;
+}
+
+/** Normalizes Frost's units into pretty symbols */
+function normalizeUnit(unit) {
+  if (!unit) return "";
+  const map = {
+    degC: "°C",
+    celsius: "°C",
+    mps: " m/s",
+    "m/s": " m/s",
+    degrees: "°",
+    percent: "%",
+    mm: " mm",
+    cm: " cm",
+    kgm2: " kg/m²",
+  };
+  return map[unit] ?? ` ${unit}`;
+}
+
+/** Formats labels like "air_temperature" → "Air Temperature" */
+function formatLabel(key) {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Returns the most recent observation timestamp */
+function getLastObsTime(observations) {
+  const times = Object.values(observations)
+    .map((v) => v?.time)
+    .filter(Boolean);
+
+  if (times.length === 0) return null;
+
+  const latestTime = times.sort().reverse()[0];
+  return new Date(latestTime).toLocaleString("no-NO", {
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }

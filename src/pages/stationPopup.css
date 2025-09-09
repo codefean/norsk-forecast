@@ -1,0 +1,56 @@
+/* stationPopup.css */
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+.station-popup .mapboxgl-popup-content {
+  overflow-y: auto;              /* ✅ Enable scrolling when needed */
+  max-height: 380px;             /* ✅ Limit popup height */
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #f9fafb;
+  padding: 14px;
+  font-family: "Open Sans", sans-serif;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  min-width: 280px;
+  max-width: 360px;
+
+  /* Smooth scroll feel */
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+
+.station-popup .mapboxgl-popup-content h4 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.station-popup .stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.station-popup .stats div {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #f9fafb;
+}
+
+.station-popup .stats div strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.station-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.6) !important;
+}
