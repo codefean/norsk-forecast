@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "./glaciers.css";
+import { findClosestStationToGlacier } from "./findClosestStationToGlacier";
 
 // ✅ Export glacier tilesets so other files can use them
 export const glacierTileset = {
@@ -127,6 +128,29 @@ export function useGlacierLayer({ mapRef }) {
             ? `${parseInt(props.zmax_m, 10)} m`
             : "N/A";
 
+        // ✅ Find closest station using parsed GeoJSON from weathermap.js
+        const stationsGeoJSON = map.__stationsGeoJSON;
+        let closestStationHTML = "";
+        if (stationsGeoJSON) {
+          const closestStation = findClosestStationToGlacier(stationsGeoJSON, feature, 20);
+
+          if (closestStation && closestStation.id) {
+            closestStationHTML = `
+              <div class="closest-station">
+                <em>📡 Nærmeste værstasjon:</em><br/>
+                <strong>${closestStation.name}</strong>
+                <span>(${closestStation.distanceKm} km unna)</span>
+              </div>
+            `;
+          } else {
+            closestStationHTML = `
+              <div class="closest-station" style="color: gray;">
+                Ingen stasjon innen 20 km.
+              </div>
+            `;
+          }
+        }
+
         const popupHTML = `
           <div class="glacier-label">
             ${glacLabel !== "Ukjent" ? `<h4>${glacLabel}</h4>` : "<h4>Ukjent isbre</h4>"}
@@ -135,6 +159,7 @@ export function useGlacierLayer({ mapRef }) {
               <div><strong>${slope}°</strong> slope</div>
               <div><strong>${zmax}</strong> max elev</div>
             </div>
+            ${closestStationHTML}
           </div>
         `;
 

@@ -113,19 +113,32 @@ const WeatherStationsMap = () => {
       );
 
       // Filter by proximity to glaciers
-      updateProgress("🧊 Filtering stations near glaciers...", step, totalSteps);
-      const stationsOnGlaciers = await filterFrostStations(stationPoints, 10);
-      updateProgress(
-        `🧊 Filtered ${stationsOnGlaciers.features.length} stations within 10 km of glaciers out of ${stationPoints.features.length}`,
-        step++,
-        totalSteps
-      );
+const stationsOnGlaciers = await filterFrostStations(stationPoints, 20);
 
-      // Create GeoJSON blob
-      const blob = new Blob([JSON.stringify(stationsOnGlaciers)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
+// Create a Blob URL for Mapbox to use as the source ✅
+const blob = new Blob([JSON.stringify(stationsOnGlaciers)], {
+  type: "application/json",
+});
+const url = URL.createObjectURL(blob);
+
+// Add the weather stations source to Mapbox ✅
+if (!mapRef.current.getSource("stations")) {
+  mapRef.current.addSource("stations", {
+    type: "geojson",
+    data: url, // ← Mapbox uses Blob URL here
+  });
+} else {
+  // If the source already exists, update its data
+  mapRef.current.getSource("stations").setData(url);
+}
+
+// ✅ Store the parsed GeoJSON on the map instance
+//    This allows glaciers.js to access it directly later
+mapRef.current.__stationsGeoJSON = stationsOnGlaciers;
+
+// ✅ (Optional) Keep a reference to the Blob URL if you ever want to revoke it later
+mapRef.current.__stationsBlobURL = url;
+
 
       // Add station source if missing
       if (!mapRef.current.getSource("stations")) {

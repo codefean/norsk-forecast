@@ -21,7 +21,7 @@ async function loadGlaciers() {
  * @param {number} [bufferKm=20] - Distance buffer in kilometers around glaciers
  * @returns {Promise<Object>} Filtered GeoJSON FeatureCollection
  */
-export async function filterFrostStations(stationGeoJSON, bufferKm = 10) {
+export async function filterFrostStations(stationGeoJSON, bufferKm = 20) {
   if (!stationGeoJSON || !stationGeoJSON.features) {
     console.warn("⚠️ No station data provided to filterFrostStations()");
     return { type: "FeatureCollection", features: [] };
