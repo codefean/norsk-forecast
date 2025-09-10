@@ -47,3 +47,26 @@
 .glacier-popup .mapboxgl-popup-tip {
   border-top-color: rgba(0, 0, 0, 0.6) !important;
 }
+
+
+
+
+
+/* Ensure click popups reuse hover styling but allow scrolling */
+.glacier-click-popup .mapboxgl-popup-content {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+/* Make station data blend nicely into glacier popup */
+.glacier-click-popup .station-popup {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+/* Force popup arrow to match popup background */
+.glacier-popup .mapboxgl-popup-tip,
+.glacier-click-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.6) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.6) !important;
+}

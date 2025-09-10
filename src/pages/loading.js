@@ -23,9 +23,6 @@ const LoadingOverlay = ({ progress, logMessages, title = "🔄 Loading Glacier &
         <div className="progress-bar" style={{ width: `${progress}%` }}></div>
       </div>
 
-      {/* Progress Percentage */}
-      <p className="progress-percent">{progress}% Complete</p>
-
       {/* Log Messages */}
       <div className="log-messages">
         {logMessages.length > 0 ? (

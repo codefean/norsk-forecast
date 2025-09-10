@@ -63,9 +63,9 @@ const WeatherStationsMap = () => {
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
-        center: [10.75, 67.91],
+        center: [12.75, 67.91],
         pitch: DEFAULT_PITCH,
-        zoom: 4.7,
+        zoom: 3.7,
       });
 
       await new Promise((resolve) => mapRef.current.on("load", resolve));
@@ -157,15 +157,15 @@ mapRef.current.__stationsBlobURL = url;
               "interpolate",
               ["linear"],
               ["zoom"],
-              0, 3,
-              5, 5,
-              10, 8,
-              15, 14,
+              0, 1.5,
+              5, 2.5,
+              10, 4,
+              15, 7
             ],
             "circle-color": "#0062ff",
-            "circle-stroke-width": 1,
+            "circle-stroke-width": .5,
             "circle-stroke-color": "#fff",
-            "circle-opacity": 0.9,
+            "circle-opacity": 0.5,
           },
         });
         updateProgress("✅ Station layer added successfully", totalSteps, totalSteps);
