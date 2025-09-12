@@ -18,9 +18,12 @@ export const glacierTileset2 = {
 };
 
 // ✅ Export layer IDs so we can reuse them
+// ✅ Export layer IDs so we can reuse them
 export const FILL_LAYER_ID_1 = "glacier-fill-scandi";
 export const FILL_LAYER_ID_2 = "glacier-fill-svalbard";
-const HIGHLIGHT_LAYER_ID = "glacier-hover-highlight";
+const HIGHLIGHT_LAYER_ID = "glacier-hover-highlight-scandi";
+const HIGHLIGHT_LAYER_ID_2 = "glacier-hover-highlight-svalbard";  // 🔹 Added this
+
 
 // 🔹 Helper: Get glacier name or fallback to GLIMS ID
 const getGlacierLabel = (props = {}) => {
@@ -74,17 +77,33 @@ export function useGlacierLayer({ mapRef }) {
 
       // 🔹 Add highlight layer on top
       if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
-        map.addLayer({
-          id: HIGHLIGHT_LAYER_ID,
-          type: "fill",
-          source: glacierTileset.sourceId,
-          "source-layer": glacierTileset.sourceLayer,
-          paint: {
-            "fill-color": "#004d80",
-            "fill-opacity": 0.7,
-          },
-          filter: ["==", "glims_id", ""],
-        });
+// Highlight for Scandinavia
+map.addLayer({
+  id: HIGHLIGHT_LAYER_ID,
+  type: "fill",
+  source: glacierTileset.sourceId,
+  "source-layer": glacierTileset.sourceLayer,
+  paint: {
+    "fill-color": "#004d80",
+    "fill-opacity": 0.7,
+  },
+  filter: ["==", "glims_id", ""],
+});
+
+// Highlight for Svalbard
+map.addLayer({
+  id: HIGHLIGHT_LAYER_ID_2,
+  type: "fill",
+  source: glacierTileset2.sourceId,
+  "source-layer": glacierTileset2.sourceLayer,
+  paint: {
+    "fill-color": "#004d80",
+    "fill-opacity": 0.7,
+  },
+  filter: ["==", "glims_id", ""],
+});
+
+
       }
 
       // 🔹 Hover popups only on desktop (no touch)
@@ -103,6 +122,7 @@ export function useGlacierLayer({ mapRef }) {
 
           if (!features.length) {
             map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+            map.setFilter(HIGHLIGHT_LAYER_ID_2, ["==", "glims_id", ""]);
             hoverPopup.remove();
             return;
           }
@@ -111,11 +131,8 @@ export function useGlacierLayer({ mapRef }) {
           const props = feature.properties;
 
           if (props?.glims_id) {
-            map.setFilter(HIGHLIGHT_LAYER_ID, [
-              "==",
-              "glims_id",
-              props.glims_id,
-            ]);
+            map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id",props.glims_id,]);
+            map.setFilter(HIGHLIGHT_LAYER_ID_2, ["==", "glims_id", props.glims_id]);
           }
 
           const glacLabel = getGlacierLabel(props);
