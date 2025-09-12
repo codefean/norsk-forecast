@@ -3,12 +3,25 @@ import { fetchLatestObservations } from "./frostAPI";
 import { processGlacier } from "./glacierModel";
 import "./stationPopup.css";
 
-/** Formats the display value, special handling for wind direction */
 function formatValue(key, value) {
   if (key === "wind_from_direction" && typeof value?.value === "number") {
     const compass = degreesToCompass(value.value);
-    return `${compass} (${value.value.toFixed(0)}°)`; // e.g. "SSE (162°)"
+    return `${compass} (${value.value.toFixed(0)}°)`;
   }
+
+  if (typeof value?.value === "number") {
+    // Precipitation: always 1 decimal
+    if (key.includes("precipitation_amount")) {
+      return value.value.toFixed(1);
+    }
+    // Humidity: integer %
+    if (key.includes("humidity")) {
+      return value.value.toFixed(0);
+    }
+    // Default: 1 decimal
+    return value.value.toFixed(1);
+  }
+
   return value.value;
 }
 
@@ -60,10 +73,8 @@ export async function buildStationPopupHTML(station, glacierProps = null) {
       observations["air_temperature P1D"] ||
       observations["air_temperature PT1H"];
 
-    const precipObs =
-      observations.precipitation_amount ||
-      observations["precipitation_amount P1D"] ||
-      observations["precipitation_amount PT1H"];
+    const precipHourly = observations["sum(precipitation_amount PT1H)"];
+    const precipDaily = observations["sum(precipitation_amount P1D)"];
 
     if (airTempObs) {
       try {
@@ -71,7 +82,8 @@ export async function buildStationPopupHTML(station, glacierProps = null) {
           {
             date: new Date().toISOString().split("T")[0],
             T: airTempObs.value,
-            P: precipObs?.value || 0,
+            P1: precipHourly?.value, // last 1h
+            P24: precipDaily?.value, // last 24h
           },
         ];
 
@@ -90,22 +102,27 @@ export async function buildStationPopupHTML(station, glacierProps = null) {
 
         if (glacierResult.today) {
           glacierStatsHTML = `
-            <div data-tooltip="Station temperature adjusted to glacier elevation using lapse rate (-0.0065°C/m)">
-              <strong>${glacierResult.today.T.toFixed(1)}°C</strong>
-              Corrected Temp
-            </div>
-            <div data-tooltip="Degree-day melt model: melt = max(T-T0,0) × DDF (snow=3, ice=7)">
-              <strong>${glacierResult.today.Melt.toFixed(1)} mm</strong>
-              Melt Today (est)
-            </div>
-            <div data-tooltip="Snowpack (SWE) from accumulated snowfall minus melt. Needs precipitation data.">
-              <strong>${glacierResult.today.SWE.toFixed(1)} mm</strong>
-              Snowpack
-            </div>
-            <div data-tooltip="Rain-on-snow (ROS) occurs if T > 0.5°C, precipitation > 5 mm, and SWE > 20 mm">
-              <strong>${glacierResult.today.ROS ? "Yes" : "No"}</strong>
-              ROS Event
-            </div>
+    <div data-tooltip="Station temperature adjusted to glacier elevation using lapse rate (-0.0065°C/m)">
+      <strong>${glacierResult.today.T.toFixed(1)}°C</strong>
+      Corrected Temp
+    </div>
+    <div data-tooltip="Degree-day melt model. Melt = max(T - 0°C, 0) × DDF. Snow DDF = 3, Ice DDF = 7">
+<strong>${(glacierResult.aggregates24h?.melt24h ?? glacierResult.today.Melt).toFixed(1)} mm</strong>
+Est. Melt (24h)
+
+    </div>
+    <div data-tooltip="Snow Water Equivalent (SWE). Snowpack from accumulated snowfall minus melt. Uses 24h or 1h precipitation if available.">
+      <strong>${glacierResult.today.SWE.toFixed(1)} mm</strong>
+      Snowpack
+    </div>
+    <div data-tooltip="Liquid water leaving the snowpack (melt + rain, minus refreeze)">
+      <strong>${glacierResult.today.Runoff.toFixed(1)} mm</strong>
+      Runoff
+    </div>
+    <div data-tooltip="Rain-on-snow severity. 0% = none, 100% = high risk. Triggered if Temp > 0.5°C, precip > 5 mm, SWE > 20 mm">
+      <strong>${(glacierResult.today.ROS * 100).toFixed(0)}%</strong>
+      ROS Severity
+    </div>
           `;
         }
       } catch (err) {
@@ -136,6 +153,8 @@ export async function buildStationPopupHTML(station, glacierProps = null) {
 /** Normalizes Frost's units into pretty symbols */
 function normalizeUnit(unit) {
   if (!unit) return "";
+  const cleaned = unit.replace(/^sum\((.+)\)$/, "$1").trim();
+
   const map = {
     degC: "°C",
     celsius: "°C",
@@ -147,12 +166,19 @@ function normalizeUnit(unit) {
     cm: " cm",
     kgm2: " kg/m²",
   };
-  return map[unit] ?? ` ${unit}`;
+
+  return map[cleaned] ?? ` ${cleaned}`;
 }
 
-/** Formats labels like "air_temperature" → "Air Temperature" */
+/** Formats labels nicely */
 function formatLabel(key) {
-  return key
+  const cleaned = key.replace(/^sum\((.+)\)$/, "$1");
+
+  if (cleaned.includes("precipitation_amount PT1H")) return "Rain (1h)";
+  if (cleaned.includes("precipitation_amount P1D")) return "Rain (24h)";
+  if (cleaned.includes("precipitation_amount")) return "Rain";
+
+  return cleaned
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }

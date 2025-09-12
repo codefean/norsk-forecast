@@ -83,12 +83,12 @@ const WeatherStationsMap = () => {
       }
 
       // Fetch stations
-      updateProgress("🔄 Fetching Frost stations...", step, totalSteps);
+      updateProgress("Fetching Frost API stations...", step, totalSteps);
       const stations = await fetchStations();
       updateProgress(`📦 Stations fetched: ${stations.length}`, step++, totalSteps);
 
       if (stations.length === 0) {
-        updateProgress("⚠️ No stations returned from Frost API", totalSteps, totalSteps);
+        updateProgress("No stations returned from Frost API", totalSteps, totalSteps);
         setLoading(false);
         return;
       }
@@ -99,7 +99,7 @@ const WeatherStationsMap = () => {
         allowedCountries.includes(station.country?.trim())
       );
       updateProgress(
-        `📌 Showing ${filteredStations.length} stations after filtering by country`,
+        `Showing ${filteredStations.length} stations after filtering by country`,
         step++,
         totalSteps
       );
@@ -107,7 +107,7 @@ const WeatherStationsMap = () => {
       // Convert to GeoJSON
       const stationPoints = frostToGeoJSON(filteredStations);
       updateProgress(
-        `✅ Converted ${stationPoints.features.length} valid stations into GeoJSON.`,
+        `Converted ${stationPoints.features.length} valid stations into GeoJSON.`,
         step++,
         totalSteps
       );
@@ -168,7 +168,7 @@ mapRef.current.__stationsBlobURL = url;
             "circle-opacity": 0.5,
           },
         });
-        updateProgress("✅ Station layer added successfully", totalSteps, totalSteps);
+        updateProgress("Station layer added successfully", totalSteps, totalSteps);
       }
 
       // Show elevation under cursor
@@ -218,7 +218,7 @@ const baseHTML = `
 // Initial popup while loading
 const popup = new mapboxgl.Popup({ className: "station-popup" })
   .setLngLat(coords)
-  .setHTML(`${baseHTML}<div style="margin-top:10px;">🔄 Laster værdata...</div>`)
+  .setHTML(`${baseHTML}<div style="margin-top:10px;">Laster værdata...</div>`)
   .addTo(mapRef.current);
 
 try {
@@ -284,7 +284,7 @@ try {
           loading={loading}
           progress={progress}
           logMessages={logMessages}
-          title="🔄 Loading Glacier & Weather Station Data..."
+          title="Loading Glacier & Weather Station Data..."
         />
       )}
       <PitchControl mapRef={mapRef} value={pitch} onChange={(p) => setPitch(p)} />

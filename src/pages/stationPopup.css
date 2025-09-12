@@ -1,10 +1,9 @@
-/* stationPopup.css */
 @import 'mapbox-gl/dist/mapbox-gl.css';
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
 .station-popup .mapboxgl-popup-content {
-  overflow-y: auto;              /* ✅ Enable scrolling when needed */
-  max-height: 380px;             /* ✅ Limit popup height */
+  overflow-y: auto;
+  max-height: 380px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(6px);
@@ -16,11 +15,9 @@
   min-width: 280px;
   max-width: 360px;
 
-  /* Smooth scroll feel */
   scrollbar-width: thin;
   scrollbar-color: #888 transparent;
 }
-
 
 .station-popup .mapboxgl-popup-content h4 {
   margin: 0 0 8px;
@@ -34,15 +31,29 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 8px;
+
+  /* let tooltips overflow outside the grid */
+  overflow: visible;
 }
 
 .station-popup .stats div {
   background: rgba(255, 255, 255, 0.15);
-  padding: 6px 8px;
   border-radius: 4px;
-  font-size: 0.85rem;
   text-align: center;
   color: #f9fafb;
+  cursor: help;
+
+  /* ✅ uniform tile sizing */
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  word-break: break-word;
+
+  /* 🆕 anchor tooltips relative to each tile */
+  position: relative;
 }
 
 .station-popup .stats div strong {
@@ -55,29 +66,11 @@
   border-top-color: rgba(0, 0, 0, 0.6) !important;
 }
 
-.station-popup .stats div {
-  position: relative;                 /* needed for tooltip positioning */
-  background: rgba(255, 255, 255, 0.15);
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  text-align: center;
-  color: #f9fafb;
-  cursor: help;                       /* show "help" cursor */
-}
-
-/* Popup container (override) */
-.station-popup .mapboxgl-popup-content {
-  overflow: visible !important;   
-  max-height: none;               
-  position: relative;             
-}
-
 /* Tooltip styling */
-.station-popup .stats div[data-tooltip]:hover::after {
+.station-popup .stats div[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 120%;                   /* push above the box */
+  bottom: 60%;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.9);
@@ -88,9 +81,9 @@
   line-height: 1.2;
   white-space: normal;
   width: max-content;
-  max-width: 100px;
+  max-width: 100px; /* a bit wider for readability */
   text-align: center;
-  z-index: 9999;                  /* ✅ stays above everything */
+  z-index: 9999;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
@@ -101,7 +94,6 @@
   opacity: 1;
 }
 
-/* Kill only the default horizontal rule effect */
 .station-popup .mapboxgl-popup-content > div {
   border-top: none !important;
 }

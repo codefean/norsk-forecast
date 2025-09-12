@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./loading.css";
 
-const LoadingOverlay = ({ progress, logMessages, title = "🔄 Loading Glacier & Weather Data...", loading }) => {
+const LoadingOverlay = ({ progress, logMessages, title = "Loading Glacier & Weather Data...", loading }) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
