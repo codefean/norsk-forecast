@@ -13,6 +13,7 @@ import LoadingOverlay from "./loading";
 import { getStationDataSummary } from "./frostAPI";
 import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
+import SearchBar from "./search";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -288,6 +289,7 @@ try {
         />
       )}
       <PitchControl mapRef={mapRef} value={pitch} onChange={(p) => setPitch(p)} />
+        <SearchBar mapRef={mapRef} />
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation
         className="citation-readout"

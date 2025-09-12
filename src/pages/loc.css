@@ -31,7 +31,7 @@ code {
 }
 
 /* Hide on mobile */
-@media (max-width: 915px) {
+@media (max-width: 950px) {
   .loc-readout {
     display: none !important;
   }
