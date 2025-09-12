@@ -4,6 +4,7 @@ import "./glaciers.css";
 import { findClosestStationToGlacier } from "./findClosestStationToGlacier";
 import { buildStationPopupHTML } from "./stationPopup";
 
+
 // ✅ Export glacier tilesets so other files can use them
 export const glacierTileset = {
   url: "mapbox://mapfean.bmdn0gwv",
@@ -236,16 +237,18 @@ export function useGlacierLayer({ mapRef }) {
           `)
           .addTo(map);
 
-        // Fetch weather data
+        // Fetch weather + glacier model data
         if (closestStation && closestStation.id) {
           try {
             const stationSummary = {
               stationId: closestStation.id,
               name: closestStation.name,
               country: closestStation.country,
+              z: closestStation.z || 0,
             };
 
-            const weatherHTML = await buildStationPopupHTML(stationSummary);
+            // 🔑 Pass glacier props into the popup builder
+            const weatherHTML = await buildStationPopupHTML(stationSummary, props);
 
             if (clickPopup) {
               const content = clickPopup
@@ -254,7 +257,7 @@ export function useGlacierLayer({ mapRef }) {
               if (content) content.innerHTML = weatherHTML;
             }
           } catch (err) {
-            console.error("❌ Failed to fetch station data:", err);
+            console.error("❌ Failed to fetch station/glacier data:", err);
             if (clickPopup) {
               const content = clickPopup
                 .getElement()
@@ -262,7 +265,7 @@ export function useGlacierLayer({ mapRef }) {
               if (content) {
                 content.innerHTML = `
                   <div class="error">
-                    ❌ Kunne ikke laste værdata.
+                    ❌ Kunne ikke laste vær- eller bredata.
                   </div>
                 `;
               }
@@ -271,21 +274,17 @@ export function useGlacierLayer({ mapRef }) {
         }
       });
 
-map.on("click", (e) => {
-  const features = map.queryRenderedFeatures(e.point, {
-    layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
-  });
+      map.on("click", (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
+        });
 
-  // If we clicked outside any glacier and there's an open popup → close it
-  if (!features.length && clickPopup) {
-    clickPopup.remove();
-    clickPopup = null;
-  }
-});
-
-
-
-
+        // If we clicked outside any glacier and there's an open popup → close it
+        if (!features.length && clickPopup) {
+          clickPopup.remove();
+          clickPopup = null;
+        }
+      });
     };
 
     if (map.isStyleLoaded()) {
