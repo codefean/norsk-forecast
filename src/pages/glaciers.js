@@ -4,7 +4,6 @@ import "./glaciers.css";
 import { findClosestStationToGlacier } from "./findClosestStationToGlacier";
 import { buildStationPopupHTML } from "./stationPopup";
 
-
 // ✅ Export glacier tilesets so other files can use them
 export const glacierTileset = {
   url: "mapbox://mapfean.bmdn0gwv",
@@ -43,6 +42,8 @@ export function useGlacierLayer({ mapRef }) {
     if (!map) return;
 
     let clickPopup = null;
+    const isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
     const addTileset = ({ url, sourceId, sourceLayer, fillId }) => {
       if (!map.getSource(sourceId)) {
@@ -86,87 +87,93 @@ export function useGlacierLayer({ mapRef }) {
         });
       }
 
-      // Styled popup on hover
-      const hoverPopup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        offset: 10,
-        className: "glacier-popup",
-      });
-
-      map.on("mousemove", (e) => {
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
+      // 🔹 Hover popups only on desktop (no touch)
+      if (!isTouchDevice) {
+        const hoverPopup = new mapboxgl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          offset: 10,
+          className: "glacier-popup",
         });
 
-        if (!features.length) {
+        map.on("mousemove", (e) => {
+          const features = map.queryRenderedFeatures(e.point, {
+            layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
+          });
+
+          if (!features.length) {
+            map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+            hoverPopup.remove();
+            return;
+          }
+
+          const feature = features[0];
+          const props = feature.properties;
+
+          if (props?.glims_id) {
+            map.setFilter(HIGHLIGHT_LAYER_ID, [
+              "==",
+              "glims_id",
+              props.glims_id,
+            ]);
+          }
+
+          const glacLabel = getGlacierLabel(props);
+          const area =
+            props?.area_km2 && !isNaN(props.area_km2)
+              ? parseFloat(props.area_km2).toFixed(2)
+              : "N/A";
+          const slope =
+            props?.slope_deg && !isNaN(props.slope_deg)
+              ? parseFloat(props.slope_deg).toFixed(1)
+              : "N/A";
+          const zmax =
+            props?.zmax_m && !isNaN(props.zmax_m)
+              ? `${parseInt(props.zmax_m, 10)} m`
+              : "N/A";
+
+          const stationsGeoJSON = map.__stationsGeoJSON;
+          const closestStation = stationsGeoJSON
+            ? findClosestStationToGlacier(stationsGeoJSON, feature, 20)
+            : null;
+
+          const popupHTML = `
+            <div class="glacier-label">
+              <h4>${glacLabel !== "Ukjent" ? glacLabel : "Ukjent isbre"}</h4>
+              <div class="stats">
+                <div><strong>${area}</strong> km²</div>
+                <div><strong>${slope}°</strong> slope</div>
+                <div><strong>${zmax}</strong> max elev</div>
+              </div>
+              ${
+                closestStation
+                  ? `<div class="closest-station" style="margin-top:6px;">
+                      📡 Nærmeste værstasjon:
+                      <strong>${closestStation.name}</strong>
+                      (${closestStation.distanceKm} km unna)
+                    </div>`
+                  : `<div class="closest-station" style="margin-top:6px; color: gray;">
+                      Ingen stasjon innen 20 km
+                    </div>`
+              }
+            </div>
+          `;
+
+          hoverPopup.setLngLat(e.lngLat).setHTML(popupHTML).addTo(map);
+        });
+
+        // On leaving glacier area → remove highlight + popup
+        map.on("mouseleave", FILL_LAYER_ID_1, () => {
           map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
           hoverPopup.remove();
-          return;
-        }
+        });
+        map.on("mouseleave", FILL_LAYER_ID_2, () => {
+          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+          hoverPopup.remove();
+        });
+      }
 
-        const feature = features[0];
-        const props = feature.properties;
-
-        if (props?.glims_id) {
-          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", props.glims_id]);
-        }
-
-        const glacLabel = getGlacierLabel(props);
-        const area =
-          props?.area_km2 && !isNaN(props.area_km2)
-            ? parseFloat(props.area_km2).toFixed(2)
-            : "N/A";
-        const slope =
-          props?.slope_deg && !isNaN(props.slope_deg)
-            ? parseFloat(props.slope_deg).toFixed(1)
-            : "N/A";
-        const zmax =
-          props?.zmax_m && !isNaN(props.zmax_m)
-            ? `${parseInt(props.zmax_m, 10)} m`
-            : "N/A";
-
-        const stationsGeoJSON = map.__stationsGeoJSON;
-        const closestStation = stationsGeoJSON
-          ? findClosestStationToGlacier(stationsGeoJSON, feature, 20)
-          : null;
-
-        const popupHTML = `
-          <div class="glacier-label">
-            <h4>${glacLabel !== "Ukjent" ? glacLabel : "Ukjent isbre"}</h4>
-            <div class="stats">
-              <div><strong>${area}</strong> km²</div>
-              <div><strong>${slope}°</strong> slope</div>
-              <div><strong>${zmax}</strong> max elev</div>
-            </div>
-            ${
-              closestStation
-                ? `<div class="closest-station" style="margin-top:6px;">
-                    📡 Nærmeste værstasjon:
-                    <strong>${closestStation.name}</strong>
-                    (${closestStation.distanceKm} km unna)
-                  </div>`
-                : `<div class="closest-station" style="margin-top:6px; color: gray;">
-                    Ingen stasjon innen 20 km
-                  </div>`
-            }
-          </div>
-        `;
-
-        hoverPopup.setLngLat(e.lngLat).setHTML(popupHTML).addTo(map);
-      });
-
-      // On leaving glacier area → remove highlight + popup
-      map.on("mouseleave", FILL_LAYER_ID_1, () => {
-        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
-        hoverPopup.remove();
-      });
-      map.on("mouseleave", FILL_LAYER_ID_2, () => {
-        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
-        hoverPopup.remove();
-      });
-
-      // Handle click popups
+      // 🔹 Handle click popups (works everywhere)
       map.on("click", [FILL_LAYER_ID_1, FILL_LAYER_ID_2], async (e) => {
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
@@ -247,8 +254,10 @@ export function useGlacierLayer({ mapRef }) {
               z: closestStation.z || 0,
             };
 
-            // 🔑 Pass glacier props into the popup builder
-            const weatherHTML = await buildStationPopupHTML(stationSummary, props);
+            const weatherHTML = await buildStationPopupHTML(
+              stationSummary,
+              props
+            );
 
             if (clickPopup) {
               const content = clickPopup
@@ -274,12 +283,12 @@ export function useGlacierLayer({ mapRef }) {
         }
       });
 
+      // 🔹 Close click popup when clicking outside
       map.on("click", (e) => {
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
         });
 
-        // If we clicked outside any glacier and there's an open popup → close it
         if (!features.length && clickPopup) {
           clickPopup.remove();
           clickPopup = null;
