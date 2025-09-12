@@ -27,3 +27,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Hide on mobile */
+@media (max-width: 915px) {
+  .citation-readout {
+    display: none !important;
+  }
+}

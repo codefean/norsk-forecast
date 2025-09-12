@@ -29,3 +29,10 @@ code {
   z-index: 99999;    /* Put it above everything */
   backdrop-filter: blur(2px);
 }
+
+/* Hide on mobile */
+@media (max-width: 915px) {
+  .loc-readout {
+    display: none !important;
+  }
+}
