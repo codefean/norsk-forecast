@@ -1,0 +1,96 @@
+/* Header container */
+.header {
+  background-color: #000000; 
+  color: white;
+  padding: 6px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
+  z-index: 2;
+}
+
+/* Title centered */
+.header-title {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.header-title h1 {
+  font-size: clamp(1rem, 5vw, 1.9rem);
+  margin: 0;
+  word-break: break-word;
+  margin-left: -8.6%;
+}
+
+/* Nav links (desktop view) */
+.nav-links {
+  display: flex;
+  gap: 40px; /* spacing like your old nav */
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 1.1em;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-links a:hover {
+  color: #1c81fc;
+  border-bottom: 2px solid #4496fa;
+}
+
+.nav-links a.active-link {
+  font-weight: bold;
+  border-bottom: 2px solid #4496fa;
+}
+
+/* Hamburger toggle (hidden by default) */
+.menu-toggle {
+  display: none;
+  font-size: 1.6em;
+  cursor: pointer;
+  color: white;
+  background: none;
+  border: none;
+}
+
+/* Mobile styles */
+@media (max-width: 1057px) {
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    left: 15px;
+    top: 10px;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #0f3754; /* your old mobile bg */
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 1rem 0;
+    gap: 10px;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    font-size: 1em;
+  }
+}

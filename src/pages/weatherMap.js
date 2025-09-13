@@ -15,6 +15,8 @@ import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
 import SearchBar from "./search";
 
+
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
 
@@ -274,11 +276,15 @@ try {
 
   return (
     <div style={{ position: "relative" }}>
-      <div
-        ref={mapContainer}
-        className="map-container"
-        style={{ width: "100%", height: "100vh" }}
-      />
+<div
+  ref={mapContainer}
+  style={{
+    width: "100%",
+    height: "calc(100vh - 43px)", // adjust for header height
+    overflow: "hidden",
+    zIndex: 1,
+  }}
+/>
 
       {loading && (
         <LoadingOverlay
