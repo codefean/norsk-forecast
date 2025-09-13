@@ -22,7 +22,10 @@
 .header-title h1 {
   font-size: clamp(1rem, 5vw, 1.9rem);
   margin: 0;
-  word-break: break-word;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Nav links (desktop view) */

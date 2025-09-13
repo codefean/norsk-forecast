@@ -36,7 +36,7 @@ const Loc = ({ cursorInfo }) => {
           </div>
         </>
       ) : (
-        <div>Move cursor over map…</div>
+        <div></div>
       )}
     </div>
   );

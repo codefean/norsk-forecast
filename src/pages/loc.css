@@ -28,6 +28,9 @@ code {
   pointer-events: none;
   z-index: 99999;    /* Put it above everything */
   backdrop-filter: blur(2px);
+  right: 12;
+  bottom: 35;
+  left: 12 !important;
 }
 
 /* Hide on mobile */

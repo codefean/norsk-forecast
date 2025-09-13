@@ -299,7 +299,7 @@ try {
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation
         className="citation-readout"
-        stylePos={{ position: "absolute", right: 12, bottom: 25, zIndex: 2 }}
+        stylePos={{ position: "absolute", zIndex: 2 }}
       />
     </div>
   );
