@@ -39,3 +39,17 @@ code {
     display: none !important;
   }
 }
+
+/* loc.css */
+
+/* Default: visible */
+.cursor-readout {
+  display: block;
+}
+
+/* Hide on small screens */
+@media (max-width: 768px) {
+  .cursor-readout {
+    display: none !important;
+  }
+}

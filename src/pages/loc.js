@@ -3,6 +3,11 @@ import React from "react";
 import './loc.css';
 
 const Loc = ({ cursorInfo }) => {
+  // Don't render if on small screen
+  if (typeof window !== "undefined" && window.innerWidth <= 768) {
+    return null;
+  }
+
   return (
     <div
       className="cursor-readout"
