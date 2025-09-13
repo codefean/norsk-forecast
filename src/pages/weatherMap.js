@@ -213,8 +213,8 @@ const baseHTML = `
     <strong>${props?.name || "Ukjent stasjon"}</strong><br/>
     <em>Land:</em> ${props?.country || "Ukjent"}<br/>
     <em>ID:</em> ${props?.id || "N/A"}<br/><br/>
-    <em>🧊 Nærmeste isbre:</em> <strong>${closestGlacier || "Ukjent"}</strong><br/>
-    <em>📏 Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
+    <em>Nærmeste isbre:</em> <strong>${closestGlacier || "Ukjent"}</strong><br/>
+    <em>Avstand:</em> ${distanceKm ? distanceKm + " km" : "?"}
   </div>
 `;
 
@@ -249,11 +249,11 @@ try {
     `);
   }
 } catch (err) {
-  console.error(`❌ Failed to fetch weather data for station ${props?.id}:`, err);
+  console.error(`Failed to fetch weather data for station ${props?.id}:`, err);
   popup.setHTML(`
     ${baseHTML}
     <div style="margin-top:10px; color: red;">
-      ❌ Kunne ikke laste værdata.
+      Kunne ikke laste værdata.
     </div>
   `);
 }

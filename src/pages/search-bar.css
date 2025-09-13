@@ -1,6 +1,6 @@
 .search-bar-container {
   position: absolute;
-  top: 15px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -77,24 +77,24 @@
 /* Mobile adjustments */
 @media (max-width: 844px) {
   .search-bar-container {
-    top: 15px;
+    top: 12px;
   }
 }
 
 @media (max-width: 580px) {
   .search-bar-container {
-    top: 15px !important;
+    top: 12px !important;
   }
 }
 
 @media (max-width: 360px) {
   .search-bar-container {
-    top: 15px !important;
+    top: 12px !important;
   }
 }
 
 @media (max-width: 667px) {
   .search-bar-container {
-    top: 15px;
+    top: 12px;
   }
 }

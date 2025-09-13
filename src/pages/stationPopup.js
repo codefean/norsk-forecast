@@ -142,10 +142,9 @@ Est. Melt (24h)
         ${glacierStatsHTML}
       </div>
 
-      <div class="footer">
+
         <em>Siste observasjon:</em>
         ${getLastObsTime(observations) || "—"}
-      </div>
     </div>
   `;
 }

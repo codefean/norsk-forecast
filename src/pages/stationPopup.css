@@ -11,12 +11,11 @@
   color: #f9fafb;
   padding: 14px;
   font-family: "Open Sans", sans-serif;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-  min-width: 280px;
-  max-width: 360px;
-
+  min-width: 270px;
+  max-width: 400px;
   scrollbar-width: thin;
   scrollbar-color: #888 transparent;
+  border: none !important;
 }
 
 .station-popup .mapboxgl-popup-content h4 {
@@ -24,6 +23,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
+  border: none !important;
 }
 
 .station-popup .stats {
@@ -40,7 +40,6 @@
   text-align: center;
   color: #f9fafb;
   cursor: pointer;
-
   min-height: 70px;
   display: flex;
   flex-direction: column;
@@ -49,17 +48,20 @@
   font-size: 0.85rem;
   word-break: break-word;
   position: relative;
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
 .station-popup .stats div strong {
   display: block;
   font-size: 0.95rem;
   color: #fff;
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
-.station-popup .mapboxgl-popup-tip {
-  border-top-color: rgba(0, 0, 0, 0.6) !important;
-}
+
 
 /* Tooltip styling */
 .station-popup .stats div[data-tooltip]::after {
@@ -82,6 +84,8 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
 /* Fade in tooltip */
@@ -91,4 +95,10 @@
 
 .station-popup .mapboxgl-popup-content > div {
   border-top: none !important;
+}
+
+.station-popup .mapboxgl-popup-content hr {
+  border: none !important;
+  height: 0 !important;
+  margin: 0 !important;
 }

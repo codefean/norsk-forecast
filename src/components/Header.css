@@ -1,19 +1,21 @@
 /* Header container */
 .header {
-  background-color: #000000; 
+  background-color: #000000;
   color: white;
   padding: 6px 15px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* nav links on the left */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   position: relative;
-  z-index: 2;
+  z-index: 5;
 }
 
-/* Title centered */
+/* Title centered absolutely */
 .header-title {
-  flex-grow: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
 }
 
@@ -21,17 +23,13 @@
   font-size: clamp(1rem, 5vw, 1.9rem);
   margin: 0;
   word-break: break-word;
-  margin-left: -8.6%;
 }
 
 /* Nav links (desktop view) */
 .nav-links {
   display: flex;
-  gap: 40px; /* spacing like your old nav */
-  align-items: center;
+  gap: 24px;
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .nav-links a {
@@ -41,16 +39,17 @@
   font-size: 1.1em;
   transition: color 0.3s ease, border-bottom 0.3s ease;
   border-bottom: 2px solid transparent;
+  padding: 4px 0;
 }
 
 .nav-links a:hover {
-  color: #1c81fc;
-  border-bottom: 2px solid #4496fa;
+  color: #1663c1;
+  border-bottom: 2px solid #1663c1;
 }
 
 .nav-links a.active-link {
   font-weight: bold;
-  border-bottom: 2px solid #4496fa;
+  border-bottom: 2px solid #1663c1;
 }
 
 /* Hamburger toggle (hidden by default) */
@@ -61,36 +60,45 @@
   color: white;
   background: none;
   border: none;
+  z-index: 11; /* stays above nav menu */
+}
+
+.menu-toggle:hover {
+  color: #4496fa;
 }
 
 /* Mobile styles */
 @media (max-width: 1057px) {
   .menu-toggle {
     display: block;
-    position: absolute;
-    left: 15px;
-    top: 10px;
+    position: relative;
+    z-index: 20;
+    margin-right: 10px;
   }
 
   .nav-links {
-    display: none;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background-color: #0f3754; /* your old mobile bg */
+    background-color: #0f3754;
     width: 100%;
     position: absolute;
     top: 100%;
     left: 0;
-    padding: 1rem 0;
     gap: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    z-index: 10;
   }
 
   .nav-links.open {
-    display: flex;
+    max-height: 200px; /* adjust for more links */
   }
 
   .nav-links a {
     font-size: 1em;
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
   }
 }
