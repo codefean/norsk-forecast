@@ -151,7 +151,7 @@ map.addLayer({
 
           const stationsGeoJSON = map.__stationsGeoJSON;
           const closestStation = stationsGeoJSON
-            ? findClosestStationToGlacier(stationsGeoJSON, feature, 20)
+            ? findClosestStationToGlacier(stationsGeoJSON, feature, 12)
             : null;
 
           const popupHTML = `
@@ -170,7 +170,7 @@ map.addLayer({
                       (${closestStation.distanceKm} km unna)
                     </div>`
                   : `<div class="closest-station" style="margin-top:6px; color: gray;">
-                      Ingen stasjon innen 20 km
+                      Ingen stasjon innen 12 km
                     </div>`
               }
             </div>
@@ -217,7 +217,7 @@ map.addLayer({
 
         const stationsGeoJSON = map.__stationsGeoJSON;
         const closestStation = stationsGeoJSON
-          ? findClosestStationToGlacier(stationsGeoJSON, feature, 20)
+          ? findClosestStationToGlacier(stationsGeoJSON, feature, 12)
           : null;
 
         // Remove existing click popup if open
@@ -251,7 +251,7 @@ map.addLayer({
                       (${closestStation.distanceKm} km unna)
                     </div>`
                   : `<div class="closest-station" style="margin-top:6px; color: gray;">
-                      Ingen stasjon innen 20 km
+                      Ingen stasjon innen 12 km
                     </div>`
               }
               <div class="station-popup" style="margin-top:12px;">

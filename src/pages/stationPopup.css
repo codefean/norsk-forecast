@@ -93,12 +93,14 @@
   opacity: 1;
 }
 
-.station-popup .mapboxgl-popup-content > div {
-  border-top: none !important;
+
+
+/* Make the popup arrow match station-popup background */
+.station-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.65) !important;
 }
 
-.station-popup .mapboxgl-popup-content hr {
-  border: none !important;
-  height: 0 !important;
-  margin: 0 !important;
+.station-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
 }
+

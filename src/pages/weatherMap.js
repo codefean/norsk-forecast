@@ -88,7 +88,7 @@ const WeatherStationsMap = () => {
       // Fetch stations
       updateProgress("Fetching Frost API stations...", step, totalSteps);
       const stations = await fetchStations();
-      updateProgress(`📦 Stations fetched: ${stations.length}`, step++, totalSteps);
+      updateProgress(`Stations fetched: ${stations.length}`, step++, totalSteps);
 
       if (stations.length === 0) {
         updateProgress("No stations returned from Frost API", totalSteps, totalSteps);
@@ -116,7 +116,7 @@ const WeatherStationsMap = () => {
       );
 
       // Filter by proximity to glaciers
-const stationsOnGlaciers = await filterFrostStations(stationPoints, 20);
+const stationsOnGlaciers = await filterFrostStations(stationPoints, 12);
 
 // Create a Blob URL for Mapbox to use as the source ✅
 const blob = new Blob([JSON.stringify(stationsOnGlaciers)], {

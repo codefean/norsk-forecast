@@ -48,7 +48,6 @@ export async function buildStationPopupHTML(station, glacierProps = null) {
 
   const observations = latestData.latest || {};
 
-  // ✅ Weather cards
   const observationHTML = Object.entries(observations)
     .map(([key, val]) => {
       if (!val || typeof val !== "object" || val.value === undefined) return "";
@@ -176,6 +175,7 @@ function formatLabel(key) {
   if (cleaned.includes("precipitation_amount PT1H")) return "Rain (1h)";
   if (cleaned.includes("precipitation_amount P1D")) return "Rain (24h)";
   if (cleaned.includes("precipitation_amount")) return "Rain";
+  if (cleaned.includes("air_temperature")) return "Air Temp";
 
   return cleaned
     .replace(/_/g, " ")

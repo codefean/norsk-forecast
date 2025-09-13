@@ -10,7 +10,7 @@ import * as turf from "@turf/turf";
  *
  * @returns {{name: string, id: string|null, distanceKm: string|null}}
  */
-export function findClosestStationToGlacier(stationsGeoJSON, glacierFeature, searchRadiusKm = 20) {
+export function findClosestStationToGlacier(stationsGeoJSON, glacierFeature, searchRadiusKm = 12) {
   if (!stationsGeoJSON || !stationsGeoJSON.features || !stationsGeoJSON.features.length) {
     return { name: "Ingen stasjoner tilgjengelig", id: null, distanceKm: null };
   }
@@ -45,7 +45,7 @@ export function findClosestStationToGlacier(stationsGeoJSON, glacierFeature, sea
 
   // If no station within range → fallback
   if (!closest || bestDist > searchRadiusKm) {
-    return { name: "Ingen stasjon innen 20 km", id: null, distanceKm: null };
+    return { name: "Ingen stasjon innen 12 km", id: null, distanceKm: null };
   }
 
   return {
