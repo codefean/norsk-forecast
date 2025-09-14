@@ -100,7 +100,6 @@ export function useLakeLayer({ mapRef }) {
             ? parseFloat(props.areal_km2).toFixed(2)
             : "N/A";
 
-        const firstObs = props?.forsteData || "Unknown";
 
         hoverPopup
           .setLngLat(e.lngLat)
@@ -108,7 +107,6 @@ export function useLakeLayer({ mapRef }) {
             `<div>
               <strong>Lake ID:</strong> ${props.id}<br/>
               <strong>Area:</strong> ${area} km²<br/>
-              <strong>First Observed:</strong> ${firstObs}
             </div>`
           )
           .addTo(map);
@@ -131,7 +129,6 @@ export function useLakeLayer({ mapRef }) {
             ? parseFloat(props.areal_km2).toFixed(2)
             : "N/A";
 
-        const firstObs = props?.forsteData || "Unknown";
 
         if (clickPopup) clickPopup.remove();
 
@@ -149,7 +146,6 @@ export function useLakeLayer({ mapRef }) {
               <div class="stats">
                 <div><strong>ID:</strong> ${props.id}</div>
                 <div><strong>${area}</strong> km²</div>
-                <div><strong>First Observed:</strong> ${firstObs}</div>
               </div>
             </div>
           `)
