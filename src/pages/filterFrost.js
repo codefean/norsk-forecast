@@ -27,31 +27,31 @@ export async function filterFrostStations(stationGeoJSON, bufferKm = 20) {
     return { type: "FeatureCollection", features: [] };
   }
 
-  // ✅ Load glaciers dynamically from /public
+
   const glaciers = await loadGlaciers();
 
-  // ✅ Precompute glacier centers once (performance boost)
+
   const glacierCenters = glaciers.features.map((glacier) => ({
     glacier,
     center: centerOfMass(glacier),
   }));
 
-  // ✅ Filter stations based on proximity or direct overlap
+
   const filtered = stationGeoJSON.features.filter((station) => {
     const pt = station; // GeoJSON Point Feature
 
     return glacierCenters.some(({ glacier, center }) => {
-      // ✅ Keep station if it's inside glacier polygon
+
       if (booleanPointInPolygon(pt, glacier)) return true;
 
-      // ✅ Otherwise, check distance from precomputed glacier center
+
       const dist = distance(pt, center, { units: "kilometers" });
       return dist <= bufferKm;
     });
   });
 
   console.log(
-    `🧊 Filtered ${filtered.length} stations within ${bufferKm} km of glaciers out of ${stationGeoJSON.features.length}`
+    `Filtered ${filtered.length} stations within ${bufferKm} km of glaciers out of ${stationGeoJSON.features.length}`
   );
 
   return {

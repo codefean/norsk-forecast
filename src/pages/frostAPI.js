@@ -26,21 +26,21 @@ function assertValidData(context, data, requiredFields = []) {
 function logSummary(context, data) {
   if (process.env.NODE_ENV === "development") {
     if (Array.isArray(data)) {
-      console.log(`🔍 ${context} → received ${data.length} items`);
+      console.log(`${context} → received ${data.length} items`);
     } else if (
       typeof data === "object" &&
       data.latest &&
       Object.keys(data.latest).length === 0
     ) {
-      console.warn(`⚠️ ${context} → latest observations empty`);
+      console.warn(`${context} → latest observations empty`);
     } else if (
       typeof data === "object" &&
       data.series &&
       Object.keys(data.series).length === 0
     ) {
-      console.warn(`⚠️ ${context} → history series empty`);
+      console.warn(`${context} → history series empty`);
     } else {
-      console.log(`🔍 ${context} →`, data);
+      console.log(`${context} →`, data);
     }
   }
 }
@@ -54,7 +54,7 @@ async function api(path, context = "API") {
   controller = new AbortController();
 
   const url = `${BACKEND_BASE}${path}`;
-  console.log(`🌐 Fetching: ${url}`);
+  console.log(`Fetching: ${url}`);
 
   let res;
   try {
@@ -64,16 +64,16 @@ async function api(path, context = "API") {
     });
   } catch (err) {
     if (err.name === "AbortError") {
-      console.warn(`⚠️ ${context}: Request aborted`);
+      console.warn(` ${context}: Request aborted`);
       throw err;
     }
-    console.error(`❌ ${context}: Network error →`, err);
+    console.error(`${context}: Network error →`, err);
     throw new Error(`${context}: Failed to connect to backend`);
   }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    console.error(`❌ ${context} ${res.status} for ${url}: ${text}`);
+    console.error(`${context} ${res.status} for ${url}: ${text}`);
     throw new Error(`${context} (${res.status}): ${text || res.statusText}`);
   }
 
@@ -118,6 +118,9 @@ export async function fetchLatestObservations(
     "stationId",
     "latest",
   ]);
+
+  delete data.latest.wind_from_direction;
+delete data.latest["wind_from_direction PT10M"];
 
   return data;
 }
@@ -182,72 +185,6 @@ export async function fetchHistory(
 }
 
 /* -----------------------------
-   Climate Normals
--------------------------------- */
-export async function fetchNormalsMonth(stationId, month, elementsCsv) {
-  const elements =
-    elementsCsv || "mean(air_temperature P1M),sum(precipitation_amount P1M)";
-  const q = new URLSearchParams({ elements, months: String(month) });
-
-  const data = await api(
-    `/api/normals/${encodeURIComponent(stationId)}?${q.toString()}`,
-    `fetchNormalsMonth(${stationId})`
-  );
-
-  if (data.error || !data.rows) {
-    console.warn(`⚠️ No normals available for ${stationId}`);
-    return { stationId, rows: {}, warning: "No normals available" };
-  }
-
-  assertValidData("fetchNormalsMonth", data, ["stationId", "rows"]);
-  logSummary("Normals Month", data.rows);
-  return data;
-}
-
-export async function fetchNormalsAvailability(stationId, elementsCsv) {
-  const q = new URLSearchParams();
-  if (elementsCsv) q.set("elements", elementsCsv);
-
-  const data = await api(
-    `/api/normals/available/${encodeURIComponent(stationId)}?${q.toString()}`,
-    `fetchNormalsAvailability(${stationId})`
-  );
-
-  assertValidData("fetchNormalsAvailability", data, ["data"]);
-  logSummary("Normals Availability", data.data);
-  return data;
-}
-
-export async function fetchClimateNormals(
-  stationId,
-  { elements, period, months, days, offset } = {}
-) {
-  if (!stationId || !elements) {
-    throw new Error("fetchClimateNormals: stationId and elements are required");
-  }
-
-  const q = new URLSearchParams({ elements });
-  if (period) q.set("period", period);
-  if (months) q.set("months", months);
-  if (days) q.set("days", days);
-  if (offset) q.set("offset", offset);
-
-  const data = await api(
-    `/api/normals/${encodeURIComponent(stationId)}?${q.toString()}`,
-    `fetchClimateNormals(${stationId})`
-  );
-
-  if (data.error || !data.rows) {
-    console.warn(`⚠️ No detailed normals available for ${stationId}`);
-    return { stationId, rows: {}, warning: "No detailed normals available" };
-  }
-
-  assertValidData("fetchClimateNormals", data, ["stationId", "rows"]);
-  logSummary("Climate Normals", data.rows);
-  return data;
-}
-
-/* -----------------------------
    Health Check
 -------------------------------- */
 export async function checkBackend() {
@@ -276,7 +213,8 @@ export async function getStationDataSummary(stationId) {
       latest: latest.latest || {},
     };
   } catch (err) {
-    console.error(`❌ Failed to fetch station summary for ${stationId}:`, err);
+    console.error(`Failed to fetch station summary for ${stationId}:`, err);
     return null;
   }
 }
+

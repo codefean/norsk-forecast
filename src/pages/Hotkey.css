@@ -1,0 +1,53 @@
+.hotkey-table {
+  position: fixed;
+  top: 55px;   /* position in upper left */
+  left: 15px;
+  right: auto; /* ensure it's on the left */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: white;
+  font-size: .85rem;
+  z-index: 2;
+  max-width: 90%; /* ensures responsiveness */
+  box-sizing: border-box;
+}
+
+.hotkey-table h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.hotkey-table table {
+  border-collapse: collapse;
+}
+
+.hotkey-table td {
+  padding: 2px 6px;
+}
+
+.hotkey-btn {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  font-size: inherit;
+}
+
+.hotkey-btn:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1180px) {
+  .hotkey-table {
+    min-width: 195px; /* ensures responsiveness */
+  }
+}
+
+/* Hide on small screens */
+@media (max-width: 844px) {
+  .hotkey-table {
+    display: none;
+  }
+}

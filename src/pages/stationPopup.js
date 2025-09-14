@@ -4,10 +4,7 @@ import { processGlacier } from "./glacierModel";
 import "./stationPopup.css";
 
 function formatValue(key, value) {
-  if (key === "wind_from_direction" && typeof value?.value === "number") {
-    const compass = degreesToCompass(value.value);
-    return `${compass} (${value.value.toFixed(0)}°)`;
-  }
+
 
   if (typeof value?.value === "number") {
     // Precipitation: always 1 decimal
@@ -25,44 +22,41 @@ function formatValue(key, value) {
   return value.value;
 }
 
-/** Converts degrees → compass (16-point compass) */
-function degreesToCompass(deg) {
-  const directions = [
-    "N", "NNE", "NE", "ENE",
-    "E", "ESE", "SE", "SSE",
-    "S", "SSW", "SW", "WSW",
-    "W", "WNW", "NW", "NNW",
-  ];
-  const idx = Math.round((deg % 360) / 22.5) % 16;
-  return directions[idx];
-}
+
 
 export async function buildStationPopupHTML(station, glacierProps = null) {
   let latestData;
   try {
     latestData = await fetchLatestObservations(station.stationId);
   } catch (err) {
-    console.error("❌ Failed to fetch latest observations:", err);
+    console.error("Failed to fetch latest observations:", err);
     latestData = { latest: {} };
   }
 
   const observations = latestData.latest || {};
 
-  const observationHTML = Object.entries(observations)
-    .map(([key, val]) => {
-      if (!val || typeof val !== "object" || val.value === undefined) return "";
+const observationHTML = Object.entries(observations)
+  .map(([key, val]) => {
+    if (
+      !val ||
+      typeof val !== "object" ||
+      val.value === undefined ||
+      key === "wind_from_direction" 
+    ) {
+      return "";
+    }
 
-      const label = formatLabel(key);
-      const unit = normalizeUnit(val.unit);
+    const label = formatLabel(key);
+    const unit = normalizeUnit(val.unit);
 
-      return `
-        <div>
-          <strong>${formatValue(key, val)}${unit}</strong>
-          ${label}
-        </div>
-      `;
-    })
-    .join("");
+    return `
+      <div>
+        <strong>${formatValue(key, val)}${unit}</strong>
+        ${label}
+      </div>
+    `;
+  })
+  .join("");
 
   // ✅ Glacier model cards (only if glacierProps provided)
   let glacierStatsHTML = "";
@@ -158,7 +152,6 @@ function normalizeUnit(unit) {
     celsius: "°C",
     mps: " m/s",
     "m/s": " m/s",
-    degrees: "°",
     percent: "%",
     mm: " mm",
     cm: " cm",

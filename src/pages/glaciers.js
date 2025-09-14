@@ -246,7 +246,7 @@ map.addLayer({
               ${
                 closestStation
                   ? `<div class="closest-station" style="margin-top:6px;">
-                      📡 Nærmeste værstasjon:
+                      Nærmeste værstasjon:
                       <strong>${closestStation.name}</strong>
                       (${closestStation.distanceKm} km unna)
                     </div>`
@@ -255,7 +255,7 @@ map.addLayer({
                     </div>`
               }
               <div class="station-popup" style="margin-top:12px;">
-                🔄 Laster værdata...
+                Laster værdata...
               </div>
             </div>
           `)
@@ -283,7 +283,7 @@ map.addLayer({
               if (content) content.innerHTML = weatherHTML;
             }
           } catch (err) {
-            console.error("❌ Failed to fetch station/glacier data:", err);
+            console.error("Failed to fetch station/glacier data:", err);
             if (clickPopup) {
               const content = clickPopup
                 .getElement()
@@ -291,7 +291,7 @@ map.addLayer({
               if (content) {
                 content.innerHTML = `
                   <div class="error">
-                    ❌ Kunne ikke laste vær- eller bredata.
+                    Kunne ikke laste vær- eller bredata.
                   </div>
                 `;
               }

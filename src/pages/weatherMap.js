@@ -15,7 +15,10 @@ import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
 import SearchBar from "./search";
 import { useLakeLayer } from "./lakes";
+import Hotkey from "./Hotkey";
 
+
+// cd /Users/seanfagan/Desktop/scandi-forecast
 
 
 mapboxgl.accessToken =
@@ -27,6 +30,28 @@ const WeatherStationsMap = () => {
 
   const DEFAULT_PITCH = 20;
   const [pitch, setPitch] = useState(DEFAULT_PITCH);
+
+  const resetZoom = () => {
+  const map = mapRef.current;
+  if (!map) return;
+  map.flyTo({
+    center: [10.395, 63.4305], // Default center for this map
+    zoom: 4.5,              // Default zoom
+    speed: 2.2,
+    pitch: DEFAULT_PITCH
+  });
+  setPitch(DEFAULT_PITCH);
+};
+
+useEffect(() => {
+  const handleKeydown = (e) => {
+    if (e.key.toLowerCase() === "r") resetZoom();
+  };
+  window.addEventListener("keydown", handleKeydown);
+  return () => window.removeEventListener("keydown", handleKeydown);
+}, []);
+
+
   const [cursorInfo, setCursorInfo] = useState({
     lat: null,
     lng: null,
@@ -67,9 +92,9 @@ const WeatherStationsMap = () => {
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
-        center: [12.75, 67.91],
+        center: [10.395, 63.4305], // Default center for this map
+        zoom: 4.5,   
         pitch: DEFAULT_PITCH,
-        zoom: 3.7,
       });
 
       await new Promise((resolve) => mapRef.current.on("load", resolve));
@@ -142,6 +167,7 @@ mapRef.current.__stationsGeoJSON = stationsOnGlaciers;
 
 // ✅ (Optional) Keep a reference to the Blob URL if you ever want to revoke it later
 mapRef.current.__stationsBlobURL = url;
+
 
 
       // Add station source if missing
@@ -303,6 +329,8 @@ try {
         className="citation-readout"
         stylePos={{ }}
       />
+      <Hotkey resetZoom={resetZoom} />
+
     </div>
   );
 };

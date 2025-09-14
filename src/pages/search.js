@@ -229,12 +229,12 @@ const SearchBar = ({ mapRef }) => {
                     if (s.bounds && !s.bounds.isEmpty()) {
                       map.fitBounds(s.bounds, { padding: 40, maxZoom: 12 });
                     } else if (s.center) {
-                      map.flyTo({ center: s.center, zoom: 10, speed: 2 });
+                      map.flyTo({ center: s.center, zoom: 9, speed: 2 });
                     } else {
                       handleSearch();
                     }
                   } else if (s.type === "address" && s.coords) {
-                    map.flyTo({ center: s.coords, zoom: 12, speed: 2 });
+                    map.flyTo({ center: s.coords, zoom: 9, speed: 2 });
                   }
                 }}
               >
