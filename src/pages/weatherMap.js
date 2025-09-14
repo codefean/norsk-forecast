@@ -14,6 +14,7 @@ import { getStationDataSummary } from "./frostAPI";
 import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
 import SearchBar from "./search";
+import { useLakeLayer } from "./lakes";
 
 
 
@@ -273,6 +274,7 @@ try {
   }, []);
 
   useGlacierLayer({ mapRef });
+  useLakeLayer({ mapRef });
 
   return (
     <div style={{ position: "relative" }}>

@@ -1,0 +1,60 @@
+/* lakes.css
+   Styling for lake popups and interaction layers.
+*/
+
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+.lake-popup .mapboxgl-popup-content {
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: white;
+  padding: 12px;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.lake-popup .mapboxgl-popup-content h4 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.lake-popup .stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lake-popup .stats div {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.lake-popup .stats div strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.lake-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.lake-click-popup .mapboxgl-popup-content {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.lake-popup .mapboxgl-popup-tip,
+.lake-click-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.6) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.6) !important;
+}
