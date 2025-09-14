@@ -1,6 +1,5 @@
 /* loc.css */
 .citation-readout {
-  position: absolute;
   padding: 8px 10px;
   background: rgba(0, 0, 0, 0.292);
   color: #ffffff78;
@@ -11,6 +10,9 @@
   backdrop-filter: blur(2px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: fixed;
+  right: .7%;  /* always 5% of the screen width from the left */
+  bottom: 30px;
 }
 
 .citation-readout:hover {

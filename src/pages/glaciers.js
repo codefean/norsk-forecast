@@ -165,7 +165,7 @@ map.addLayer({
               ${
                 closestStation
                   ? `<div class="closest-station" style="margin-top:6px;">
-                      📡 Nærmeste værstasjon:
+                      Nærmeste værstasjon:
                       <strong>${closestStation.name}</strong>
                       (${closestStation.distanceKm} km unna)
                     </div>`
