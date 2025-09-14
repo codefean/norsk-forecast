@@ -144,7 +144,6 @@ export function useLakeLayer({ mapRef }) {
             <div class="lake-label">
               <h4>Glacial Lake</h4>
               <div class="stats">
-                <div><strong>ID:</strong> ${props.id}</div>
                 <div><strong>${area}</strong> km²</div>
               </div>
             </div>
