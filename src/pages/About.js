@@ -51,7 +51,7 @@ const About = () => {
         </p>
 
         {/* Math section */}
-        <h3>How the Math Works</h3>
+        <h3>Model Calculations</h3>
         <div className="about-math">
           <div data-tooltip="Station temperature adjusted to glacier elevation using lapse rate (-0.0065°C/m)">
             <strong>Corrected Temp:</strong> T<sub>glacier</sub> = T<sub>station</sub> + lapse × Δz
