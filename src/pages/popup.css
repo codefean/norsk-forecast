@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+/* ================================
+   Scandi Popup Overlay
+================================ */
+.scandi-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 16px;
+}
+
+/* ================================
+   Popup Box
+================================ */
+.scandi-popup-box {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #f9fafb;
+  padding: 18px 20px;
+  border-radius: 12px;
+  font-family: "Open Sans", sans-serif;
+  min-width: 270px;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.4);
+  scrollbar-width: thin;
+  scrollbar-color: #00d4ff transparent;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.scandi-popup-box h2 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ================================
+   Popup Text
+================================ */
+.popup-text {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.popup-text strong {
+  color: #fff;
+}
+
+.popup-text.small {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* ================================
+   Close Button
+================================ */
+.scandi-popup-close-button {
+  display: inline-block;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.scandi-popup-close-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ================================
+   Animations
+================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ================================
+   Mobile Adjustments
+================================ */
+@media (max-width: 500px) {
+  .scandi-popup-box {
+    width: 100%;
+    max-width: 95%;
+    padding: 16px;
+    font-size: 0.85rem;
+  }
+
+  .scandi-popup-box h2 {
+    font-size: 1.05rem;
+  }
+}

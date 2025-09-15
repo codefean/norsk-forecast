@@ -17,6 +17,8 @@ import { useLakeLayer } from "./lakes";
 import Hotkey from "./Hotkey";
 import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
+import popup from "./popup";
+import BetaPopup from "./popup";
 
 
 // cd /Users/seanfagan/Desktop/scandi-forecast
@@ -361,6 +363,7 @@ const WeatherStationsMap = () => {
       <Citation className="citation-readout" stylePos={{}} />
       <Hotkey resetZoom={resetZoom} />
       <MapLegend />
+      <BetaPopup/>
 
       {/* Toggle Panel */}
       <LayersToggle
