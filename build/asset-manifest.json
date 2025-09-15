@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/www.norskglacierforecast.org/static/css/main.fcd37c45.css",
-    "main.js": "/www.norskglacierforecast.org/static/js/main.bce354b4.js",
+    "main.js": "/www.norskglacierforecast.org/static/js/main.cdb5bb1a.js",
     "index.html": "/www.norskglacierforecast.org/index.html",
     "main.fcd37c45.css.map": "/www.norskglacierforecast.org/static/css/main.fcd37c45.css.map",
-    "main.bce354b4.js.map": "/www.norskglacierforecast.org/static/js/main.bce354b4.js.map"
+    "main.cdb5bb1a.js.map": "/www.norskglacierforecast.org/static/js/main.cdb5bb1a.js.map"
   },
   "entrypoints": [
     "static/css/main.fcd37c45.css",
-    "static/js/main.bce354b4.js"
+    "static/js/main.cdb5bb1a.js"
   ]
 }
