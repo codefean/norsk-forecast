@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "./popup.css";
+import "./loading.css";
 
-const BetaPopup = ({ autoClose = false, autoCloseDelay = 8000 }) => {
+const BetaPopup = ({ loading, progress, title }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Check if the popup was already dismissed
-    const dismissed = localStorage.getItem("betaPopupDismissed");
-    if (!dismissed) {
+    // Show popup if still loading (skip if cached data loads instantly)
+    if (loading) {
       setVisible(true);
     }
-  }, []);
-
-  useEffect(() => {
-    if (autoClose && visible) {
-      const timer = setTimeout(() => handleClose(), autoCloseDelay);
-      return () => clearTimeout(timer);
-    }
-  }, [autoClose, autoCloseDelay, visible]);
+  }, [loading]);
 
   const handleClose = () => {
+    if (loading) return; // block until finished
     setVisible(false);
-    localStorage.setItem("betaPopupDismissed", "true"); // Remember dismissal
   };
 
   if (!visible) return null;
@@ -37,10 +30,9 @@ const BetaPopup = ({ autoClose = false, autoCloseDelay = 8000 }) => {
         <h2 id="scandi-popup-title">Scandi Glacier Forecast</h2>
 
         <p className="popup-text">
-          An interactive platform
-          for exploring glaciers and glacial lakes across Scandinavia. 
-          <strong> Click on glaciers</strong> to see their predicted weather
-          data and explore nearby glacial lakes.
+          An interactive platform for exploring glaciers and glacial lakes across
+          Scandinavia. <strong>Click on glaciers</strong> to see their predicted
+          weather data and explore nearby glacial lakes.
         </p>
 
         <p className="popup-text">
@@ -57,16 +49,30 @@ const BetaPopup = ({ autoClose = false, autoCloseDelay = 8000 }) => {
         </p>
 
         <p className="popup-text small">
-          Created by <strong>Sean Fagan</strong>, Sept 1–14, 2025, as a portfolio
-          project for PhD applications.
+          Created by <strong>Sean Fagan</strong>, Sept 1–14, 2025, as a
+          portfolio project for PhD applications.
         </p>
 
-        <button
-          className="scandi-popup-close-button"
-          onClick={handleClose}
-        >
-          <strong>OK</strong>
-        </button>
+        {/* Loading area */}
+        {loading ? (
+          <>
+            <h3 className="loading-title">{title}</h3>
+            <div className="progress-percent">{progress}%</div>
+            <div className="progress-container">
+              <div
+                className="progress-bar"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </>
+        ) : (
+          <button
+            className="scandi-popup-close-button"
+            onClick={handleClose}
+          >
+            <strong>OK</strong>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -9,7 +9,6 @@ import Loc from "./loc";
 import Citation from "./citation";
 import "./weatherMap.css";
 import { findClosestGlacier } from "./findClosestGlacier";
-import LoadingOverlay from "./loading";
 import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
 import SearchBar from "./search";
@@ -73,7 +72,7 @@ const WeatherStationsMap = () => {
   }, []);
 
   const [loading, setLoading] = useState(true);
-  const [logMessages, setLogMessages] = useState([]);
+  const [, setLogMessages] = useState([]);
   const [progress, setProgress] = useState(0);
 
   const updateProgress = (msg, step, totalSteps) => {
@@ -350,22 +349,19 @@ const WeatherStationsMap = () => {
         }}
       />
 
-      {loading && (
-        <LoadingOverlay
-          loading={loading}
-          progress={progress}
-          logMessages={logMessages}
-          title="Loading Data..."
-        />
-      )}
-
       <PitchControl mapRef={mapRef} value={pitch} onChange={(p) => setPitch(p)} />
       <SearchBar mapRef={mapRef} />
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Citation className="citation-readout" stylePos={{}} />
       <Hotkey resetZoom={resetZoom} />
       <MapLegend />
-      <BetaPopup/>
+      <BetaPopup
+  loading={loading}
+  progress={progress}
+  title="Loading Data..."
+/>
+
+
 
       {/* Toggle Panel */}
       <LayersToggle
