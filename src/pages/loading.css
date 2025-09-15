@@ -6,7 +6,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 480px;
+  width: 400px;
   max-width: 90%;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
@@ -139,5 +139,39 @@
     opacity: 0;
     transform: translate(-50%, -55%);
     visibility: hidden;
+  }
+}
+
+/* ================================
+   Responsive Adjustments
+================================ */
+@media (max-width: 915px) {
+  .loading-overlay {
+    width: 65%;
+    padding: 16px 18px;
+    border-radius: 10px;
+  }
+
+  .loading-title {
+    font-size: 1rem;
+  }
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border-width: 3px;
+  }
+
+  .progress-container {
+    height: 8px;
+  }
+
+  .progress-percent,
+  .log-messages {
+    font-size: 0.75rem;
+  }
+
+  .log-messages {
+    max-height: 120px;
   }
 }

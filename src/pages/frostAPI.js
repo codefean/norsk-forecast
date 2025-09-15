@@ -1,4 +1,3 @@
-// src/frostAPI.js
 // Thin client for your deployed backend (no direct Frost calls from the browser)
 
 const BACKEND_BASE =
@@ -119,9 +118,6 @@ export async function fetchLatestObservations(
     "latest",
   ]);
 
-  delete data.latest.wind_from_direction;
-delete data.latest["wind_from_direction PT10M"];
-
   return data;
 }
 
@@ -185,6 +181,72 @@ export async function fetchHistory(
 }
 
 /* -----------------------------
+   Climate Normals
+-------------------------------- */
+export async function fetchNormalsMonth(stationId, month, elementsCsv) {
+  const elements =
+    elementsCsv || "mean(air_temperature P1M),sum(precipitation_amount P1M)";
+  const q = new URLSearchParams({ elements, months: String(month) });
+
+  const data = await api(
+    `/api/normals/${encodeURIComponent(stationId)}?${q.toString()}`,
+    `fetchNormalsMonth(${stationId})`
+  );
+
+  if (data.error || !data.rows) {
+    console.warn(`⚠️ No normals available for ${stationId}`);
+    return { stationId, rows: {}, warning: "No normals available" };
+  }
+
+  assertValidData("fetchNormalsMonth", data, ["stationId", "rows"]);
+  logSummary("Normals Month", data.rows);
+  return data;
+}
+
+export async function fetchNormalsAvailability(stationId, elementsCsv) {
+  const q = new URLSearchParams();
+  if (elementsCsv) q.set("elements", elementsCsv);
+
+  const data = await api(
+    `/api/normals/available/${encodeURIComponent(stationId)}?${q.toString()}`,
+    `fetchNormalsAvailability(${stationId})`
+  );
+
+  assertValidData("fetchNormalsAvailability", data, ["data"]);
+  logSummary("Normals Availability", data.data);
+  return data;
+}
+
+export async function fetchClimateNormals(
+  stationId,
+  { elements, period, months, days, offset } = {}
+) {
+  if (!stationId || !elements) {
+    throw new Error("fetchClimateNormals: stationId and elements are required");
+  }
+
+  const q = new URLSearchParams({ elements });
+  if (period) q.set("period", period);
+  if (months) q.set("months", months);
+  if (days) q.set("days", days);
+  if (offset) q.set("offset", offset);
+
+  const data = await api(
+    `/api/normals/${encodeURIComponent(stationId)}?${q.toString()}`,
+    `fetchClimateNormals(${stationId})`
+  );
+
+  if (data.error || !data.rows) {
+    console.warn(`⚠️ No detailed normals available for ${stationId}`);
+    return { stationId, rows: {}, warning: "No detailed normals available" };
+  }
+
+  assertValidData("fetchClimateNormals", data, ["stationId", "rows"]);
+  logSummary("Climate Normals", data.rows);
+  return data;
+}
+
+/* -----------------------------
    Health Check
 -------------------------------- */
 export async function checkBackend() {
@@ -192,7 +254,7 @@ export async function checkBackend() {
     await api(`/api/health`, "checkBackend");
     return true;
   } catch {
-    console.error("❌ Backend health check failed");
+    console.error(" Backend health check failed");
     return false;
   }
 }
@@ -218,3 +280,42 @@ export async function getStationDataSummary(stationId) {
   }
 }
 
+/* -----------------------------
+   Time Series Wrapper (NEW)
+-------------------------------- */
+
+/**
+ * Convenience wrapper: fetch time series and return as a flat array of obs.
+ *
+ * @param {string} stationId - Frost station ID.
+ * @param {number} days - How many days back to fetch (default 14).
+ * @returns {Promise<Array<{time: string, air_temperature?: number, precipitation_amount?: number}>>}
+ */
+export async function fetchTimeSeriesObservations(stationId, days = 14) {
+  const end = new Date();
+  const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
+
+  const startISO = start.toISOString();
+  const endISO = end.toISOString();
+
+  const elements = [
+    "air_temperature",
+    "sum(precipitation_amount PT1H)",
+    "sum(precipitation_amount P1D)",
+    "precipitation_amount",
+  ].join(",");
+
+  const { series } = await fetchHistory(stationId, {
+    startISO,
+    endISO,
+    elements,
+    chunkDays: 7,
+  });
+
+  if (!series || typeof series !== "object") return [];
+
+  return Object.entries(series).map(([time, values]) => ({
+    time,
+    ...values,
+  }));
+}

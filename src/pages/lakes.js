@@ -1,24 +1,29 @@
-import { useEffect } from "react";
+// lakes.js
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import Papa from "papaparse";
 import "./lakes.css";
 
-// ✅ Glacial lakes tileset config
+// ✅ Lake CSV (centroids, with GLOF + years)
+export const LAKE_CSV_URL = `${process.env.PUBLIC_URL}/GLO_2019_WGS84.csv`;
+
+// ✅ Lake tileset config (Mapbox polygons for outlines)
 export const lakeTileset = {
   url: "mapbox://mapfean.64gel3ni", // your Mapbox tileset ID
-  sourceLayer: "GLO_2019_WGS84",    // ✅ must match layer name in Mapbox Studio
-  sourceId: "GLO_2019_WGS84",       // unique internal source ID
+  sourceLayer: "GLO_2019_WGS84",    // must match Mapbox Studio layer name
+  sourceId: "GLO_2019_WGS84",
 };
 
-export const FILL_LAYER_ID = "lake-fill";
-export const HIGHLIGHT_LAYER_ID = "lake-highlight";
+export const OUTLINE_LAYER_ID = "lake-outline";
 
 export function useLakeLayer({ mapRef }) {
+  const markersRef = useRef([]);
+
   useEffect(() => {
     const map = mapRef?.current;
     if (!map) return;
 
-    let clickPopup = null;
-
+    // --- Add lake outlines only ---
     const addTileset = () => {
       if (!map.getSource(lakeTileset.sourceId)) {
         map.addSource(lakeTileset.sourceId, {
@@ -27,137 +32,114 @@ export function useLakeLayer({ mapRef }) {
         });
       }
 
-      if (!map.getLayer(FILL_LAYER_ID)) {
+      if (!map.getLayer(OUTLINE_LAYER_ID)) {
         map.addLayer({
-          id: FILL_LAYER_ID,
-          type: "fill",
-          source: lakeTileset.sourceId,
-          "source-layer": lakeTileset.sourceLayer,
-          paint: {
-            "fill-color": "#2ba0ff",
-            "fill-opacity": 0.5,
-          },
-        });
-      }
-
-      if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
-        map.addLayer({
-          id: HIGHLIGHT_LAYER_ID,
+          id: OUTLINE_LAYER_ID,
           type: "line",
           source: lakeTileset.sourceId,
           "source-layer": lakeTileset.sourceLayer,
           paint: {
-            "line-color": "#004d80",
-            "line-width": 2,
+            "line-color": "blue",
+            "line-width": 1.5,
           },
-          filter: ["==", "id", ""],
         });
+      }
+    };
+
+    // --- Add lake centroid markers from CSV ---
+    const addCentroidMarkers = async () => {
+      try {
+        const response = await fetch(LAKE_CSV_URL);
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => header.trim().replace(/|\]/g, ""),
+          complete: (result) => {
+            const lakes = result.data
+              .map((row) => ({
+                id: row.bresjoID,
+                lat: parseFloat(row.centroid_lat),
+                lon: parseFloat(row.centroid_lon),
+                glof: String(row.GLOF).toLowerCase() === "true",
+                glof_years: row.glof_years, // expects CSV column "glof_years"
+              }))
+              .filter((lake) => !isNaN(lake.lat) && !isNaN(lake.lon));
+
+            // Remove old markers
+            markersRef.current.forEach((m) => m.remove());
+            markersRef.current = [];
+
+            // Add markers
+            lakes.forEach(({ lat, lon, glof, glof_years, id }) => {
+              const el = document.createElement("div");
+              el.className = glof ? "place-marker" : "marker circle";
+
+              const marker = new mapboxgl.Marker(el, { anchor: "center" })
+                .setLngLat([lon, lat])
+                .addTo(map);
+
+              markersRef.current.push(marker);
+
+              if (glof) {
+                // ✅ Build popup content
+                const popupContent = document.createElement("div");
+                popupContent.className = "glacier-popup";
+                popupContent.innerHTML = `
+                  <h4>Lake ${id}</h4>
+                  <div class="stats">
+                    <div>
+                      <strong>GLOF Years</strong>
+                      ${glof_years && String(glof_years).trim() !== ""
+                        ? String(glof_years)
+                            .replace(/[\]]/g, "")
+                            .split(",")
+                            .map((y) => y.trim())
+                            .filter((y) => y)
+                            .join(", ")
+                        : "Unknown"}
+                    </div>
+                  </div>
+                `;
+
+                const popup = new mapboxgl.Popup({
+                  closeButton: false,
+                  closeOnClick: false,
+                  className: "glacier-popup",
+                  offset: 12,
+                }).setDOMContent(popupContent);
+
+                // Show popup on hover
+                el.addEventListener("mouseenter", () => {
+                  popup.setLngLat([lon, lat]).addTo(map);
+                });
+                el.addEventListener("mouseleave", () => {
+                  popup.remove();
+                });
+              }
+
+              // ✅ Fly to lake on click (all markers)
+              el.addEventListener("click", (e) => {
+                e.stopPropagation();
+                map.flyTo({
+                  center: [lon, lat],
+                  zoom: 15.5,
+                  speed: 2,
+                });
+              });
+            });
+          },
+        });
+      } catch (err) {
+        console.error("Failed to load lake CSV:", err);
       }
     };
 
     const onLoad = () => {
       addTileset();
-
-      // Safety check
-      if (!map.getLayer(FILL_LAYER_ID) || !map.getLayer(HIGHLIGHT_LAYER_ID)) {
-        console.warn("Lake layers not ready yet, skipping event binding.");
-        return;
-      }
-
-      // Hover popup
-      const hoverPopup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        offset: 8,
-        className: "lake-popup",
-      });
-
-      map.on("mousemove", (e) => {
-        if (!map.getLayer(FILL_LAYER_ID)) return;
-
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [FILL_LAYER_ID],
-        });
-
-        if (!features.length) {
-          if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
-            map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "id", ""]);
-          }
-          hoverPopup.remove();
-          return;
-        }
-
-        const feature = features[0];
-        const props = feature.properties;
-
-        // Highlight
-        if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
-          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "id", props.id]);
-        }
-
-        const area =
-          props?.areal_km2 && !isNaN(props.areal_km2)
-            ? parseFloat(props.areal_km2).toFixed(2)
-            : "N/A";
-
-
-        hoverPopup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div>
-              <strong>Lake ID:</strong> ${props.id}<br/>
-              <strong>Area:</strong> ${area} km²<br/>
-            </div>`
-          )
-          .addTo(map);
-      });
-
-      // Click popup
-      map.on("click", FILL_LAYER_ID, (e) => {
-        if (!map.getLayer(FILL_LAYER_ID)) return;
-
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [FILL_LAYER_ID],
-        });
-        if (!features.length) return;
-
-        const feature = features[0];
-        const props = feature.properties;
-
-        const area =
-          props?.areal_km2 && !isNaN(props.areal_km2)
-            ? parseFloat(props.areal_km2).toFixed(2)
-            : "N/A";
-
-
-        if (clickPopup) clickPopup.remove();
-
-        clickPopup = new mapboxgl.Popup({
-          className: "lake-popup lake-click-popup",
-          closeButton: true,
-          closeOnClick: false,
-          anchor: "top",
-          offset: [0, -10],
-        })
-          .setLngLat(e.lngLat)
-          .setHTML(`
-            <div class="lake-label">
-              <h4>Glacial Lake</h4>
-              <div class="stats">
-                <div><strong>${area}</strong> km²</div>
-              </div>
-            </div>
-          `)
-          .addTo(map);
-      });
-
-      // Remove highlight on mouse leave
-      map.on("mouseleave", FILL_LAYER_ID, () => {
-        if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
-          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "id", ""]);
-        }
-        hoverPopup.remove();
-      });
+      addCentroidMarkers();
     };
 
     if (map.isStyleLoaded()) {
@@ -166,10 +148,23 @@ export function useLakeLayer({ mapRef }) {
       map.on("load", onLoad);
     }
 
-    return () => {
-      if (map) {
-        map.off("load", onLoad);
+return () => {
+  markersRef.current.forEach((m) => m.remove());
+  markersRef.current = [];
+
+  if (map && typeof map.getLayer === "function" && typeof map.getSource === "function") {
+    try {
+      if (map.getLayer(OUTLINE_LAYER_ID)) {
+        map.removeLayer(OUTLINE_LAYER_ID);
       }
-    };
+      if (map.getSource(lakeTileset.sourceId)) {
+        map.removeSource(lakeTileset.sourceId);
+      }
+    } catch (err) {
+      console.warn("Cleanup skipped, map already disposed:", err);
+    }
+  }
+};
+
   }, [mapRef]);
 }

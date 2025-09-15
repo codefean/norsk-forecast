@@ -105,3 +105,9 @@
     text-align: center;
   }
 }
+
+.beta-text {
+  font-weight: normal;
+  font-size: clamp(1rem, 5vw, 1.9rem);
+  opacity: 0.8;       /* optional: soften the color */
+}

@@ -1,0 +1,45 @@
+/* src/LayersToggle.css */
+.layer-toggle-panel {
+  position: fixed;
+  top: 160px;   /* just below the hotkey-table */
+  left: 15px;
+  right: auto; /* ensure it's on the left */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: white;
+  font-size: .85rem;
+  z-index: 2;
+  max-width: 90%; /* ensures responsiveness */
+  box-sizing: border-box;
+}
+
+.layer-toggle-panel h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.layer-toggle-panel label {
+  display: block;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.layer-toggle-panel input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: #efefef; 
+}
+
+@media screen and (max-width: 1180px) {
+  .layer-toggle-panel {
+    min-width: 195px;
+  }
+}
+
+/* Hide on small screens */
+@media (max-width: 844px) {
+  .layer-toggle-panel {
+    display: none;
+  }
+}
