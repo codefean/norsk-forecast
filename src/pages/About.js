@@ -33,6 +33,45 @@ const About = () => {
         </p>
       </div>
 
+      {/* Glacier Model Section */}
+      <div className="about-content">
+        <h2>Glacier Temperature Index Model</h2>
+        <p>
+          The glacier model is a <strong>beta-stage temperature-index (degree-day) snow–ice melt 
+          and runoff model</strong>. It pulls weather data from the closest available station to the glacier and adjusts 
+          temperature to glacier elevation using a lapse rate. Melt is calculated directly from temperature, while 
+          precipitation (when available) is partitioned into snowfall and rainfall to update the snowpack and runoff.  
+        </p>
+        <p>
+          If precipitation data is missing, the model can still run in a 
+          <strong> temperature-only mode</strong>, which means melt is simulated but snow accumulation and rain-on-snow 
+          events are not captured as realistically. Because it depends on station data that may be incomplete, the outputs are 
+          <strong> not fully accurate and should be considered experimental</strong>, but the model is continuously being tuned 
+          and improved.
+        </p>
+
+        {/* Math section */}
+        <h3>How the Math Works</h3>
+        <div className="about-math">
+          <div data-tooltip="Station temperature adjusted to glacier elevation using lapse rate (-0.0065°C/m)">
+            <strong>Corrected Temp:</strong> T<sub>glacier</sub> = T<sub>station</sub> + lapse × Δz
+          </div>
+          <div data-tooltip="Degree-day melt model. Melt = max(T - 0°C, 0) × DDF. Snow DDF = 3, Ice DDF = 7">
+            <strong>Melt:</strong> max(T − 0 °C, 0) × DDF  
+            <em> (3 mm w.e./°C/day for snow, 7 mm w.e./°C/day for ice)</em>
+          </div>
+          <div data-tooltip="Snow Water Equivalent (SWE). Snowpack from accumulated snowfall minus melt.">
+            <strong>Snowpack (SWE):</strong> SWE<sub>t</sub> = SWE<sub>t−1</sub> + snowfall − melt
+          </div>
+          <div data-tooltip="Liquid water leaving the snowpack (melt + rain, minus refreeze)">
+            <strong>Runoff:</strong> runoff = melt + rain − refreeze
+          </div>
+          <div data-tooltip="Rain-on-snow severity. 0% = none, 100% = high risk. Triggered if Temp > 0.5°C, precip > 5 mm, SWE > 20 mm">
+            <strong>ROS Severity:</strong> triggered if T {'>'} 0.5 °C, P {'>'} 5 mm, SWE {'>'} 20 mm
+          </div>
+        </div>
+      </div>
+
       {/* Citations Section */}
       <div className="about-citations">
         <h2>Citations</h2>

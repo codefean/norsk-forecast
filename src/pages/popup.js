@@ -49,7 +49,7 @@ const BetaPopup = ({ loading, progress, title }) => {
         </p>
 
         <p className="popup-text small">
-          Created by <strong>Sean Fagan</strong>, Sept 1–14, 2025, as a
+          Created by <strong>Sean Fagan</strong>, in September 2025, as a
           portfolio project for PhD applications.
         </p>
 
