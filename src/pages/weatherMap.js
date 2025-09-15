@@ -17,7 +17,6 @@ import { useLakeLayer } from "./lakes";
 import Hotkey from "./Hotkey";
 import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
-import popup from "./popup";
 import BetaPopup from "./popup";
 
 
@@ -84,7 +83,7 @@ const WeatherStationsMap = () => {
   };
 
   // Toggle state for stations and lakes
-  const [showStations, setShowStations] = useState(true);
+  const [showStations, setShowStations] = useState(false);
   const [showLakes, setShowLakes] = useState(true);
 
   useEffect(() => {

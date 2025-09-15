@@ -28,7 +28,7 @@
   border-radius: 12px;
   font-family: "Open Sans", sans-serif;
   min-width: 270px;
-  max-width: 420px;
+  max-width: 400px;
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.4);
@@ -100,15 +100,11 @@
 /* ================================
    Mobile Adjustments
 ================================ */
-@media (max-width: 500px) {
-  .scandi-popup-box {
-    width: 100%;
-    max-width: 95%;
-    padding: 16px;
-    font-size: 0.85rem;
-  }
+@media (max-width: 915px) {
 
-  .scandi-popup-box h2 {
-    font-size: 1.05rem;
-  }
+  .scandi-popup-box {
+  width: 65%;
+
+
+}
 }
