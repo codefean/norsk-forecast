@@ -18,7 +18,7 @@ const useDocumentTitle = (title) => {
 
 // Page wrappers to handle title updates
 const WeatherMapPage = () => {
-  useDocumentTitle("Scandi Glacier Forecast");
+  useDocumentTitle("Norsk Glacier Forecast");
   return <WeatherMap />;
 };
 
@@ -34,7 +34,7 @@ const App = () => {
         <Header />
         <main className="main-content">
           <Routes>
-           <Route path="/scandi-forecast" element={<WeatherMapPage />} />
+           <Route path="/norsk-forecast" element={<WeatherMapPage />} />
             <Route path="/weatherMap" element={<WeatherMapPage />} />
             <Route path="/about" element={<AboutPage />} />
           </Routes>

@@ -27,7 +27,7 @@ const BetaPopup = ({ loading, progress, title }) => {
       aria-labelledby="scandi-popup-title"
     >
       <div className="scandi-popup-box">
-        <h2 id="scandi-popup-title">Scandi Glacier Forecast</h2>
+        <h2 id="scandi-popup-title">Norsk Glacier Forecast</h2>
 
         <p className="popup-text">
           An interactive platform for exploring glaciers and glacial lakes across
