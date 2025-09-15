@@ -184,6 +184,9 @@ const WeatherStationsMap = () => {
           id: "stations-layer",
           type: "circle",
           source: "stations",
+          layout: {
+    visibility: "none",
+  },
           paint: {
             "circle-radius": [
               "interpolate",
