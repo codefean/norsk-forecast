@@ -1,6 +1,6 @@
 // src/App.js
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 import WeatherMap from "./pages/weatherMap";
 import About from "./pages/About";
@@ -34,9 +34,13 @@ const App = () => {
         <Header />
         <main className="main-content">
           <Routes>
-           <Route path="/norsk-forecast" element={<WeatherMapPage />} />
+            {/* Default home route */}
+            <Route path="/" element={<WeatherMapPage />} />
+            <Route path="/norsk-forecast" element={<WeatherMapPage />} />
             <Route path="/weatherMap" element={<WeatherMapPage />} />
             <Route path="/about" element={<AboutPage />} />
+            {/* Fallback for 404 */}
+            <Route path="*" element={<WeatherMapPage />} />
           </Routes>
         </main>
         <Footer />
