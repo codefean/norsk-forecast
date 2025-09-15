@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/scandi-forecast/static/css/main.fcd37c45.css",
-    "main.js": "/scandi-forecast/static/js/main.b2b65fde.js",
+    "main.js": "/scandi-forecast/static/js/main.c2c0e810.js",
     "index.html": "/scandi-forecast/index.html",
     "main.fcd37c45.css.map": "/scandi-forecast/static/css/main.fcd37c45.css.map",
-    "main.b2b65fde.js.map": "/scandi-forecast/static/js/main.b2b65fde.js.map"
+    "main.c2c0e810.js.map": "/scandi-forecast/static/js/main.c2c0e810.js.map"
   },
   "entrypoints": [
     "static/css/main.fcd37c45.css",
-    "static/js/main.b2b65fde.js"
+    "static/js/main.c2c0e810.js"
   ]
 }
