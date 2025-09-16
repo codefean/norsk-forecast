@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "https://www.norskglacierforecast.org",
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@google-analytics/data": "^5.1.0",

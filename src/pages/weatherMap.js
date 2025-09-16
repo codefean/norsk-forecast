@@ -1,10 +1,18 @@
+// src/WeatherStationsMap.js
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { fetchStations, getStationDataSummary } from "./frostAPI";
+
+import {
+  fetchStations,
+  getStationDataSummary,
+} from "./frostAPI";
+
 import { frostToGeoJSON } from "./geojsonUtils";
 import { useGlacierLayer } from "./glaciers";
 import { filterFrostStations } from "./filterFrost";
+import { loadNveStationsForMap } from "./filterNVE.js";
+
 import Loc from "./loc";
 import Citation from "./citation";
 import "./weatherMap.css";
@@ -18,8 +26,6 @@ import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
 
-
-// cd /Users/seanfagan/Desktop/scandi-forecast
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -81,15 +87,16 @@ const WeatherStationsMap = () => {
     setProgress(Math.round((step / totalSteps) * 100));
   };
 
-  // Toggle state for stations and lakes
-  const [showStations, setShowStations] = useState(false);
+  // Toggle states
+  const [showStations, setShowStations] = useState(true);       // Frost
+  const [showNveStations, setShowNveStations] = useState(true); // NVE
   const [showLakes, setShowLakes] = useState(true);
 
   useEffect(() => {
     const initMap = async () => {
       if (mapRef.current) return;
 
-      const totalSteps = 7;
+      const totalSteps = 9;
       let step = 1;
 
       updateProgress("Initializing Mapbox map...", step++, totalSteps);
@@ -105,7 +112,7 @@ const WeatherStationsMap = () => {
       await new Promise((resolve) => mapRef.current.on("load", resolve));
       updateProgress("Mapbox map fully loaded", step++, totalSteps);
 
-      // Add terrain
+      // Terrain DEM
       if (!mapRef.current.getSource("mapbox-dem")) {
         mapRef.current.addSource("mapbox-dem", {
           type: "raster-dem",
@@ -116,76 +123,36 @@ const WeatherStationsMap = () => {
         mapRef.current.setTerrain({ source: "mapbox-dem", exaggeration: 1.0 });
       }
 
-      // Fetch stations
+      // 🌡️ Fetch Frost stations
       updateProgress("Fetching Frost API stations...", step, totalSteps);
-      const stations = await fetchStations();
-      updateProgress(`Stations fetched: ${stations.length}`, step++, totalSteps);
+      const frostStations = await fetchStations();
+      updateProgress(
+        `Frost stations fetched: ${frostStations.length}`,
+        step++,
+        totalSteps
+      );
 
-      if (stations.length === 0) {
-        updateProgress("No stations returned from Frost API", totalSteps, totalSteps);
-        setLoading(false);
-        return;
-      }
-
-      // Filter by country
       const allowedCountries = ["Sverige", "Norge", "Svalbard og Jan Mayen"];
-      const filteredStations = stations.filter((station) =>
-        allowedCountries.includes(station.country?.trim())
+      const filteredFrost = frostStations.filter((st) =>
+        allowedCountries.includes(st.country?.trim())
       );
-      updateProgress(
-        `Showing ${filteredStations.length} stations after filtering by country`,
-        step++,
-        totalSteps
-      );
+      const frostPoints = frostToGeoJSON(filteredFrost);
+      const frostOnGlaciers = await filterFrostStations(frostPoints, 12);
 
-      // Convert to GeoJSON
-      const stationPoints = frostToGeoJSON(filteredStations);
-      updateProgress(
-        `Converted ${stationPoints.features.length} valid stations into GeoJSON.`,
-        step++,
-        totalSteps
-      );
-
-      // Keep glaciers under lakes
-      if (
-        mapRef.current.getLayer("glacier-fill") &&
-        mapRef.current.getLayer("lake-outline")
-      ) {
-        mapRef.current.moveLayer("glacier-fill", "lake-outline");
-      }
-
-      // Filter stations near glaciers
-      const stationsOnGlaciers = await filterFrostStations(stationPoints, 12);
-
-      const blob = new Blob([JSON.stringify(stationsOnGlaciers)], {
+      const frostBlob = new Blob([JSON.stringify(frostOnGlaciers)], {
         type: "application/json",
       });
-      const url = URL.createObjectURL(blob);
+      const frostUrl = URL.createObjectURL(frostBlob);
 
-      // Add stations source
       if (!mapRef.current.getSource("stations")) {
-        mapRef.current.addSource("stations", { type: "geojson", data: url });
-        updateProgress(
-          "📡 Glacier-filtered GeoJSON source added successfully",
-          step,
-          totalSteps
-        );
-      } else {
-        mapRef.current.getSource("stations").setData(url);
+        mapRef.current.addSource("stations", { type: "geojson", data: frostUrl });
       }
-
-      mapRef.current.__stationsGeoJSON = stationsOnGlaciers;
-      mapRef.current.__stationsBlobURL = url;
-
-      // Add stations layer
       if (!mapRef.current.getLayer("stations-layer")) {
         mapRef.current.addLayer({
           id: "stations-layer",
           type: "circle",
           source: "stations",
-          layout: {
-    visibility: "none",
-  },
+          layout: { visibility: "visible" },
           paint: {
             "circle-radius": [
               "interpolate",
@@ -196,14 +163,41 @@ const WeatherStationsMap = () => {
               10, 5,
               15, 9,
             ],
-            "circle-color": "#8a2be2",
+            "circle-color": "#8a2be2", // Frost = purple
             "circle-stroke-width": 1,
             "circle-stroke-color": "#fff",
             "circle-opacity": 0.8,
           },
         });
-        updateProgress("Station layer added successfully", totalSteps, totalSteps);
       }
+
+      updateProgress("Frost stations layer added", step++, totalSteps);
+
+// After Frost stations are added
+updateProgress("Fetching NVE stations...", step, totalSteps);
+const nveGeoJSON = await loadNveStationsForMap();
+
+if (!mapRef.current.getSource("nveStations")) {
+  mapRef.current.addSource("nveStations", { type: "geojson", data: nveGeoJSON });
+}
+
+if (!mapRef.current.getLayer("nveStations-layer")) {
+  mapRef.current.addLayer({
+    id: "nveStations-layer",
+    type: "circle",
+    source: "nveStations",
+    layout: { visibility: "visible" },
+    paint: {
+      "circle-radius": 5,
+      "circle-color": "#1f78b4", // blue for NVE
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#fff",
+    },
+  });
+}
+
+updateProgress("NVE stations layer added", step++, totalSteps);
+
 
       // Cursor elevation
       mapRef.current.on("mousemove", (e) => {
@@ -222,7 +216,7 @@ const WeatherStationsMap = () => {
         setCursorInfo({ lat: null, lng: null, elevM: null });
       });
 
-      // Station clicks
+      // Frost station popups
       mapRef.current.on("click", "stations-layer", async (e) => {
         const features = mapRef.current.queryRenderedFeatures(e.point, {
           layers: ["stations-layer"],
@@ -232,7 +226,6 @@ const WeatherStationsMap = () => {
         const props = features[0].properties;
         const coords = features[0].geometry.coordinates;
 
-        // Find nearest glacier
         const { name: closestGlacier, distanceKm } = findClosestGlacier(
           mapRef.current,
           coords,
@@ -277,11 +270,7 @@ const WeatherStationsMap = () => {
               </div>
             `);
           }
-        } catch (err) {
-          console.error(
-            `Failed to fetch weather data for station ${props?.id}:`,
-            err
-          );
+        } catch {
           popup.setHTML(`
             ${baseHTML}
             <div style="margin-top:10px; color: red;">
@@ -304,12 +293,11 @@ const WeatherStationsMap = () => {
     };
   }, []);
 
-  // Sync toggles with map + DOM markers
+  // 🔄 Sync toggles
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    // Stations
     if (map.getLayer("stations-layer")) {
       map.setLayoutProperty(
         "stations-layer",
@@ -318,7 +306,14 @@ const WeatherStationsMap = () => {
       );
     }
 
-    // Lakes (outline + markers from lakes.js)
+    if (map.getLayer("nve-stations-layer")) {
+      map.setLayoutProperty(
+        "nve-stations-layer",
+        "visibility",
+        showNveStations ? "visible" : "none"
+      );
+    }
+
     if (map.getLayer("lake-outline")) {
       map.setLayoutProperty(
         "lake-outline",
@@ -331,9 +326,9 @@ const WeatherStationsMap = () => {
     lakeMarkers.forEach((el) => {
       el.style.display = showLakes ? "block" : "none";
     });
-  }, [showStations, showLakes]);
+  }, [showStations, showNveStations, showLakes]);
 
-  // Glaciers + lakes always mounted
+  // Always mount glaciers + lakes
   useGlacierLayer({ mapRef });
   useLakeLayer({ mapRef });
 
@@ -355,18 +350,14 @@ const WeatherStationsMap = () => {
       <Citation className="citation-readout" stylePos={{}} />
       <Hotkey resetZoom={resetZoom} />
       <MapLegend />
-      <BetaPopup
-  loading={loading}
-  progress={progress}
-  title="Loading Data..."
-/>
-
-
+      <BetaPopup loading={loading} progress={progress} title="Loading Data..." />
 
       {/* Toggle Panel */}
       <LayersToggle
         showStations={showStations}
         setShowStations={setShowStations}
+        showNveStations={showNveStations}
+        setShowNveStations={setShowNveStations}
         showLakes={showLakes}
         setShowLakes={setShowLakes}
       />
