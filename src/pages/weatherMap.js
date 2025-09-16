@@ -25,6 +25,8 @@ import Hotkey from "./Hotkey";
 import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
+import { attachNvePopup } from "./nvePopup";
+
 
 
 mapboxgl.accessToken =
@@ -173,7 +175,6 @@ const WeatherStationsMap = () => {
 
       updateProgress("Frost stations layer added", step++, totalSteps);
 
-// After Frost stations are added
 updateProgress("Fetching NVE stations...", step, totalSteps);
 const nveGeoJSON = await loadNveStationsForMap();
 
@@ -197,6 +198,9 @@ if (!mapRef.current.getLayer("nveStations-layer")) {
 }
 
 updateProgress("NVE stations layer added", step++, totalSteps);
+
+// ✅ Enable popups
+attachNvePopup(mapRef.current);
 
 
       // Cursor elevation
