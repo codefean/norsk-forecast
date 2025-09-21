@@ -3,8 +3,8 @@
 const BACKEND_BASE =
   process.env.NEXT_PUBLIC_BACKEND_BASE || "https://scandi-backend.onrender.com";
 
-let controller;       // ✅ For aborting stale requests
-let stationCache;     // ✅ Cache stations to avoid repeated fetches
+let controller;       
+let stationCache;     
 
 /* -----------------------------
    Debug Helpers
@@ -318,91 +318,4 @@ export async function fetchTimeSeriesObservations(stationId, days = 14) {
     time,
     ...values,
   }));
-}
-/* -----------------------------
-   NVE Stations
--------------------------------- */
-export async function fetchNveStations() {
-  const data = await api(`/api/nve/stations`, "fetchNveStations");
-
-  if (!Array.isArray(data)) {
-    throw new Error("fetchNveStations: Expected an array of stations");
-  }
-
-  logSummary("NVE Stations", data);
-  return data;
-}
-
-/* -----------------------------
-   NVE Latest Observations
--------------------------------- */
-export async function fetchNveLatest(
-  stationIds = [],
-  { parameter = "1000", resolutionTime = 60, referenceTime = null } = {}
-) {
-  if (!stationIds || stationIds.length === 0) {
-    const stations = await fetchNveStations();
-    stationIds = stations.map((s) => s.stationId);
-  }
-
-  const q = new URLSearchParams({
-    stationId: stationIds.join(","),
-    parameter,
-    resolutionTime: String(resolutionTime),
-  });
-  if (referenceTime) q.set("referenceTime", referenceTime);
-
-  const data = await api(
-    `/api/nve/observations?${q.toString()}`,
-    "fetchNveLatest"
-  );
-
-  if (!Array.isArray(data)) {
-    console.warn("fetchNveLatest: Unexpected response format", data);
-    return [];
-  }
-
-  logSummary("NVE Latest", data);
-  return data;
-}
-
-/* -----------------------------
-   NVE Series (metadata about what’s available)
--------------------------------- */
-export async function fetchNveSeries(stationId) {
-  if (!stationId) throw new Error("fetchNveSeries: stationId required");
-
-  const data = await api(
-    `/api/nve/series?stationId=${encodeURIComponent(stationId)}`,
-    `fetchNveSeries(${stationId})`
-  );
-
-  if (!data || !Array.isArray(data.data)) {
-    throw new Error("fetchNveSeries: Expected array under data.data");
-  }
-
-  logSummary("NVE Series", data.data);
-  return data.data;
-}
-
-/* -----------------------------
-   NVE Summary (Station + Latest Obs)
--------------------------------- */
-export async function getNveStationDataSummary(stationId) {
-  try {
-    const [series, obs] = await Promise.all([
-      fetchNveSeries(stationId),
-      fetchNveLatest([stationId], { parameter: "1000", resolutionTime: 60 }),
-    ]);
-
-    return {
-      stationId,
-      name: series?.[0]?.stationName || null,
-      parameter: series?.[0]?.parameterName || null,
-      latest: obs?.[0]?.observations?.[0] || null,
-    };
-  } catch (err) {
-    console.error(`Failed to fetch NVE summary for ${stationId}:`, err);
-    return null;
-  }
 }

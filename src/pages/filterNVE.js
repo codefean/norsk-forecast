@@ -2,15 +2,19 @@
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import distance from "@turf/distance";
 import centerOfMass from "@turf/center-of-mass";
-import { fetchNveStations } from "./frostAPI"; // 👈 adjust path if needed
+import { fetchNveStations } from "./nveAPI"; 
 
 /**
  * Load glacier polygons from public folder.
  */
 async function loadGlaciers() {
-  const response = await fetch(`${process.env.PUBLIC_URL}/scandi_glaciers3.geojson`);
+  const response = await fetch(
+    `${process.env.PUBLIC_URL}/scandi_glaciers3.geojson`
+  );
   if (!response.ok) {
-    throw new Error(`❌ Failed to load glaciers GeoJSON: ${response.statusText}`);
+    throw new Error(
+      `Failed to load glaciers GeoJSON: ${response.statusText}`
+    );
   }
   return await response.json();
 }
@@ -26,7 +30,10 @@ function toGeoJSON(stations) {
       .filter((st) => st.latitude != null && st.longitude != null)
       .map((st) => ({
         type: "Feature",
-        geometry: { type: "Point", coordinates: [st.longitude, st.latitude] },
+        geometry: {
+          type: "Point",
+          coordinates: [st.longitude, st.latitude],
+        },
         properties: { ...st },
       })),
   };
@@ -53,12 +60,12 @@ export async function filterNveStations(stations) {
   const filtered = stationGeoJSON.features.filter((station) =>
     glacierCenters.some(({ glacier, center }) => {
       if (booleanPointInPolygon(station, glacier)) return true;
-      return distance(station, center, { units: "kilometers" }) <= 5;
+      return distance(station, center, { units: "kilometers" }) <= 12;
     })
   );
 
   console.log(
-    `✅ Filtered ${filtered.length} NVE stations inside glaciers or within 5 km out of ${stationGeoJSON.features.length}`
+    `✅ Filtered ${filtered.length} NVE stations inside glaciers or within 12 km out of ${stationGeoJSON.features.length}`
   );
 
   return { type: "FeatureCollection", features: filtered };

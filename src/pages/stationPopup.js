@@ -119,7 +119,7 @@ Est. Melt (24h)
           `;
         }
       } catch (err) {
-        console.error("❌ Glacier model failed:", err);
+        console.error("Glacier model failed:", err);
       }
     }
   }

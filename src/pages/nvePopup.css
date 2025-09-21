@@ -1,0 +1,117 @@
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+/* Root popup container */
+.station-popup .mapboxgl-popup-content {
+  overflow-y: auto;
+  max-height: 380px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #f9fafb;
+  padding: 14px;
+  font-family: "Open Sans", sans-serif;
+  min-width: 270px;
+  max-width: 400px;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+  border: none !important;
+}
+
+/* Station name / header */
+.station-popup h4 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Station ID text */
+.station-popup .station-id {
+  font-size: 0.85rem;
+  color: #d1d5db;
+  margin-bottom: 10px;
+}
+
+/* Observation grid (parameters like Vannstand, Snødybde, Nedbør) */
+.station-popup .obs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Individual observation card */
+.station-popup .obs-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  text-align: center;
+  color: #f9fafb;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  word-break: break-word;
+  position: relative;
+}
+
+/* Parameter label */
+.station-popup .obs-card strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+/* Value text */
+.station-popup .obs-card .value {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* Timestamp text */
+.station-popup .obs-card .time {
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+/* Tooltip for cards */
+.station-popup .obs-card[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: normal;
+  width: max-content;
+  max-width: 140px;
+  text-align: center;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Fade-in tooltip on hover */
+.station-popup .obs-card[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Match arrow color to popup background */
+.station-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+.station-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
+}

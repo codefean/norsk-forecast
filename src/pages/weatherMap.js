@@ -3,11 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import {
-  fetchStations,
-  getStationDataSummary,
-} from "./frostAPI";
-
+import { fetchStations, getStationDataSummary } from "./frostAPI";
 import { frostToGeoJSON } from "./geojsonUtils";
 import { useGlacierLayer } from "./glaciers";
 import { filterFrostStations } from "./filterFrost";
@@ -26,8 +22,6 @@ import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
 import { attachNvePopup } from "./nvePopup";
-
-
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
@@ -98,7 +92,7 @@ const WeatherStationsMap = () => {
     const initMap = async () => {
       if (mapRef.current) return;
 
-      const totalSteps = 9;
+      const totalSteps = 10; // adjusted
       let step = 1;
 
       updateProgress("Initializing Mapbox map...", step++, totalSteps);
@@ -175,33 +169,36 @@ const WeatherStationsMap = () => {
 
       updateProgress("Frost stations layer added", step++, totalSteps);
 
-updateProgress("Fetching NVE stations...", step, totalSteps);
-const nveGeoJSON = await loadNveStationsForMap();
+      // 💧 Fetch NVE stations
+      updateProgress("Fetching NVE stations...", step, totalSteps);
+      const nveGeoJSON = await loadNveStationsForMap();
 
-if (!mapRef.current.getSource("nveStations")) {
-  mapRef.current.addSource("nveStations", { type: "geojson", data: nveGeoJSON });
-}
+      if (!mapRef.current.getSource("nveStations")) {
+        mapRef.current.addSource("nveStations", {
+          type: "geojson",
+          data: nveGeoJSON,
+        });
+      }
 
-if (!mapRef.current.getLayer("nveStations-layer")) {
-  mapRef.current.addLayer({
-    id: "nveStations-layer",
-    type: "circle",
-    source: "nveStations",
-    layout: { visibility: "visible" },
-    paint: {
-      "circle-radius": 5,
-      "circle-color": "#1f78b4", // blue for NVE
-      "circle-stroke-width": 1,
-      "circle-stroke-color": "#fff",
-    },
-  });
-}
+      if (!mapRef.current.getLayer("nveStations-layer")) {
+        mapRef.current.addLayer({
+          id: "nveStations-layer",
+          type: "circle",
+          source: "nveStations",
+          layout: { visibility: "visible" },
+          paint: {
+            "circle-radius": 5,
+            "circle-color": "#1f78b4", // blue for NVE
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#fff",
+          },
+        });
+      }
 
-updateProgress("NVE stations layer added", step++, totalSteps);
+      updateProgress("NVE stations layer added", step++, totalSteps);
 
-// ✅ Enable popups
-attachNvePopup(mapRef.current);
-
+      // ✅ Enable popups
+      attachNvePopup(mapRef.current);
 
       // Cursor elevation
       mapRef.current.on("mousemove", (e) => {
@@ -248,7 +245,9 @@ attachNvePopup(mapRef.current);
 
         const popup = new mapboxgl.Popup({ className: "station-popup" })
           .setLngLat(coords)
-          .setHTML(`${baseHTML}<div style="margin-top:10px;">Laster værdata...</div>`)
+          .setHTML(
+            `${baseHTML}<div style="margin-top:10px;">Laster værdata...</div>`
+          )
           .addTo(mapRef.current);
 
         try {
@@ -310,9 +309,9 @@ attachNvePopup(mapRef.current);
       );
     }
 
-    if (map.getLayer("nve-stations-layer")) {
+    if (map.getLayer("nveStations-layer")) {
       map.setLayoutProperty(
-        "nve-stations-layer",
+        "nveStations-layer",
         "visibility",
         showNveStations ? "visible" : "none"
       );
