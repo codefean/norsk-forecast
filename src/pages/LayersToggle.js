@@ -38,7 +38,7 @@ const LayersToggle = ({
           checked={showLakes}
           onChange={() => setShowLakes(!showLakes)}
         />
-        Lakes
+        Glacial Lakes
       </label>
     </div>
   );

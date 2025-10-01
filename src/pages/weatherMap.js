@@ -85,8 +85,8 @@ const WeatherStationsMap = () => {
 
   // Toggle states
   const [showStations, setShowStations] = useState(true);       // Frost
-  const [showNveStations, setShowNveStations] = useState(true); // NVE
-  const [showLakes, setShowLakes] = useState(true);
+  const [showNveStations, setShowNveStations] = useState(false); // NVE
+  const [showLakes, setShowLakes] = useState(false);              // Lakes
 
   useEffect(() => {
     const initMap = async () => {
@@ -134,6 +134,10 @@ const WeatherStationsMap = () => {
       );
       const frostPoints = frostToGeoJSON(filteredFrost);
       const frostOnGlaciers = await filterFrostStations(frostPoints, 12);
+      mapRef.current.__stationsGeoJSON = frostOnGlaciers;
+      console.log("✅ Frost stations attached:", frostOnGlaciers.features.length);
+
+
 
       const frostBlob = new Blob([JSON.stringify(frostOnGlaciers)], {
         type: "application/json",
