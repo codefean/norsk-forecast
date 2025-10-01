@@ -53,7 +53,6 @@ export function findClosestStationToGlacier(
   }
 
   if (!closest || bestDist > searchRadiusKm) {
-    console.warn("No station within radius", { bestDist });
     return { name: "Ingen stasjon innen 12 km", id: null, distanceKm: null };
   }
 

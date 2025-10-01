@@ -18,12 +18,10 @@ export const glacierTileset2 = {
 };
 
 // ✅ Export layer IDs so we can reuse them
-// ✅ Export layer IDs so we can reuse them
 export const FILL_LAYER_ID_1 = "glacier-fill-scandi";
 export const FILL_LAYER_ID_2 = "glacier-fill-svalbard";
 const HIGHLIGHT_LAYER_ID = "glacier-hover-highlight-scandi";
-const HIGHLIGHT_LAYER_ID_2 = "glacier-hover-highlight-svalbard";  // 🔹 Added this
-
+const HIGHLIGHT_LAYER_ID_2 = "glacier-hover-highlight-svalbard";
 
 // 🔹 Helper: Get glacier name or fallback to GLIMS ID
 const getGlacierLabel = (props = {}) => {
@@ -60,14 +58,14 @@ export function useGlacierLayer({ mapRef }) {
           source: sourceId,
           "source-layer": sourceLayer,
           paint: {
-            "fill-color": "#2ba0ff",
+            "fill-color": "#2ba0ff", // base color (light blue)
             "fill-opacity": 0.4,
           },
         });
       }
     };
 
-    const onLoad = () => {
+    const onLoad = async () => {
       // Add both glacier tilesets
       addTileset({ ...glacierTileset, fillId: FILL_LAYER_ID_1 });
       addTileset({ ...glacierTileset2, fillId: FILL_LAYER_ID_2 });
@@ -77,34 +75,98 @@ export function useGlacierLayer({ mapRef }) {
 
       // 🔹 Add highlight layer on top
       if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
-// Highlight for Scandinavia
-map.addLayer({
-  id: HIGHLIGHT_LAYER_ID,
-  type: "fill",
-  source: glacierTileset.sourceId,
-  "source-layer": glacierTileset.sourceLayer,
-  paint: {
-    "fill-color": "#004d80",
-    "fill-opacity": 0.7,
-  },
-  filter: ["==", "glims_id", ""],
-});
+        // Highlight for Scandinavia
+        map.addLayer({
+          id: HIGHLIGHT_LAYER_ID,
+          type: "fill",
+          source: glacierTileset.sourceId,
+          "source-layer": glacierTileset.sourceLayer,
+          paint: {
+            "fill-color": "#004d80",
+            "fill-opacity": 0.7,
+          },
+          filter: ["==", "glims_id", ""],
+        });
 
-// Highlight for Svalbard
-map.addLayer({
-  id: HIGHLIGHT_LAYER_ID_2,
-  type: "fill",
-  source: glacierTileset2.sourceId,
-  "source-layer": glacierTileset2.sourceLayer,
-  paint: {
-    "fill-color": "#004d80",
-    "fill-opacity": 0.7,
-  },
-  filter: ["==", "glims_id", ""],
-});
-
-
+        // Highlight for Svalbard
+        map.addLayer({
+          id: HIGHLIGHT_LAYER_ID_2,
+          type: "fill",
+          source: glacierTileset2.sourceId,
+          "source-layer": glacierTileset2.sourceLayer,
+          paint: {
+            "fill-color": "#004d80",
+            "fill-opacity": 0.7,
+          },
+          filter: ["==", "glims_id", ""],
+        });
       }
+
+      // 🔹 Shade glaciers that have a station within 12 km darker
+      const shadeGlaciersWithStations = async (radiusKm = 12) => {
+        const stations = map.__stationsGeoJSON;
+        if (!stations) {
+          console.warn("⚠️ No stations loaded yet");
+          return;
+        }
+
+        const allGlaciers = [
+          ...map.querySourceFeatures(glacierTileset.sourceId, {
+            sourceLayer: glacierTileset.sourceLayer,
+          }),
+          ...map.querySourceFeatures(glacierTileset2.sourceId, {
+            sourceLayer: glacierTileset2.sourceLayer,
+          }),
+        ];
+
+        const coveredIds = [];
+
+        console.log(`Checking ${allGlaciers.length} glaciers for nearby stations…`);
+
+        for (const glacier of allGlaciers) {
+          const nearby = findClosestStationToGlacier(stations, glacier, radiusKm);
+          if (nearby && nearby.id) {
+            coveredIds.push(glacier.properties.glims_id);
+          }
+        }
+
+        console.log(
+          `✅ ${coveredIds.length} glaciers have a station within ${radiusKm} km`
+        );
+
+        // Add overlay for glaciers with nearby stations
+        if (!map.getLayer("glaciers-with-stations")) {
+          map.addLayer({
+            id: "glaciers-with-stations",
+            type: "fill",
+            source: glacierTileset.sourceId,
+            "source-layer": glacierTileset.sourceLayer,
+            paint: {
+              "fill-color": "#005b99", // darker blue
+              "fill-opacity": 0.6,
+            },
+            filter: ["in", "glims_id", ...coveredIds],
+          });
+        }
+
+        // Add for Svalbard too
+        if (!map.getLayer("glaciers-with-stations-svalbard")) {
+          map.addLayer({
+            id: "glaciers-with-stations-svalbard",
+            type: "fill",
+            source: glacierTileset2.sourceId,
+            "source-layer": glacierTileset2.sourceLayer,
+            paint: {
+              "fill-color": "#005b99",
+              "fill-opacity": 0.6,
+            },
+            filter: ["in", "glims_id", ...coveredIds],
+          });
+        }
+      };
+
+      // Run after map + stations ready
+      setTimeout(() => shadeGlaciersWithStations(12), 1500);
 
       // 🔹 Hover popups only on desktop (no touch)
       if (!isTouchDevice) {
@@ -131,7 +193,7 @@ map.addLayer({
           const props = feature.properties;
 
           if (props?.glims_id) {
-            map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id",props.glims_id,]);
+            map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", props.glims_id]);
             map.setFilter(HIGHLIGHT_LAYER_ID_2, ["==", "glims_id", props.glims_id]);
           }
 
@@ -151,7 +213,7 @@ map.addLayer({
 
           const stationsGeoJSON = map.__stationsGeoJSON;
           const closestStation = stationsGeoJSON
-            ? findClosestStationToGlacier(stationsGeoJSON, feature, 12)
+            ? findClosestStationToGlacier(stationsGeoJSON, feature, 12, e.lngLat)
             : null;
 
           const popupHTML = `
@@ -185,7 +247,7 @@ map.addLayer({
           hoverPopup.remove();
         });
         map.on("mouseleave", FILL_LAYER_ID_2, () => {
-          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "glims_id", ""]);
+          map.setFilter(HIGHLIGHT_LAYER_ID_2, ["==", "glims_id", ""]);
           hoverPopup.remove();
         });
       }
@@ -195,12 +257,10 @@ map.addLayer({
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
         });
-
         if (!features.length) return;
 
         const feature = features[0];
         const props = feature.properties;
-
         const glacLabel = getGlacierLabel(props);
         const area =
           props?.area_km2 && !isNaN(props.area_km2)
@@ -217,7 +277,7 @@ map.addLayer({
 
         const stationsGeoJSON = map.__stationsGeoJSON;
         const closestStation = stationsGeoJSON
-          ? findClosestStationToGlacier(stationsGeoJSON, feature, 12)
+          ? findClosestStationToGlacier(stationsGeoJSON, feature, 12, e.lngLat)
           : null;
 
         // Remove existing click popup if open
@@ -226,7 +286,6 @@ map.addLayer({
           clickPopup = null;
         }
 
-        // Create new click popup
         clickPopup = new mapboxgl.Popup({
           className: "glacier-popup glacier-click-popup",
           closeButton: true,
