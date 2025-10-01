@@ -29,7 +29,7 @@ const LayersToggle = ({
           checked={showNveStations}
           onChange={() => setShowNveStations(!showNveStations)}
         />
-        NVE Glacier Stations
+        NVE Stations
       </label>
 
       <label>

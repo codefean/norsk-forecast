@@ -29,8 +29,8 @@
 
 /* Title */
 .loading-title {
-  margin-bottom: 14px;
-  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-size: 1rem;
   font-weight: 600;
   animation: pulse 1.5s infinite ease-in-out;
 }

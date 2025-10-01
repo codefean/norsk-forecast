@@ -15,7 +15,7 @@ import "./weatherMap.css";
 import { findClosestGlacier } from "./findClosestGlacier";
 import { buildStationPopupHTML } from "./stationPopup";
 import PitchControl from "./PitchControl";
-import SearchBar from "./search";
+import SearchBar from "./search"; 
 import { useLakeLayer } from "./lakes";
 import Hotkey from "./Hotkey";
 import MapLegend from "./MapLegend";
@@ -189,7 +189,7 @@ const WeatherStationsMap = () => {
           id: "nveStations-layer",
           type: "circle",
           source: "nveStations",
-          layout: { visibility: "visible" },
+          layout: { visibility: "none" },
           paint: {
             "circle-radius": 5,
             "circle-color": "#1f78b4", // blue for NVE
@@ -286,6 +286,15 @@ const WeatherStationsMap = () => {
           `);
         }
       });
+      // ✅ Hide layers initially
+if (mapRef.current.getLayer("nveStations-layer")) {
+  mapRef.current.setLayoutProperty("nveStations-layer", "visibility", "none");
+}
+if (mapRef.current.getLayer("lake-outline")) {
+  mapRef.current.setLayoutProperty("lake-outline", "visibility", "none");
+}
+const lakeMarkers = document.querySelectorAll(".marker, .place-marker");
+lakeMarkers.forEach((el) => (el.style.display = "none"));
 
       setLoading(false);
     };
@@ -337,7 +346,7 @@ const WeatherStationsMap = () => {
 
   // Always mount glaciers + lakes
   useGlacierLayer({ mapRef });
-  useLakeLayer({ mapRef });
+useLakeLayer({ mapRef, show: showLakes, visibility: "none" });
 
   return (
     <div style={{ position: "relative" }}>
