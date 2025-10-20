@@ -18,7 +18,7 @@ const useDocumentTitle = (title) => {
 
 // Page wrappers to handle title updates
 const WeatherMapPage = () => {
-  useDocumentTitle("Norsk Glacier Forecast");
+  useDocumentTitle("Norsk Landslide Forecast");
   return <WeatherMap />;
 };
 
