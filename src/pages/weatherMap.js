@@ -16,6 +16,7 @@ import BetaPopup from "./popup";
 import { useLandslideLayer } from "./landslide";
 
 // cd /Users/seanfagan/Desktop/norsk-forecast
+//
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
