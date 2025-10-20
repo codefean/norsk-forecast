@@ -39,7 +39,7 @@ const MapLegend = () => {
 
 
 <div className="map-legend-item">
-  <div className="historical-event" />
+  <div className="historical-event-dot" />
   <div className="map-legend-label">
     <strong>Historiske hendelser</strong>
     {expanded && (

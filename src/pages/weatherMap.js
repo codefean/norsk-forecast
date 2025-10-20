@@ -48,8 +48,8 @@ const WeatherStationsMap = () => {
     const map = mapRef.current;
     if (!map) return;
     map.flyTo({
-      center: [10.395, 63.4305],
-      zoom: 4.5,
+      center: [7.312, 62.2583],
+        zoom: 9.5,
       speed: 2.2,
       pitch: DEFAULT_PITCH,
     });
@@ -93,8 +93,8 @@ const WeatherStationsMap = () => {
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
-        center: [10.395, 63.4305],
-        zoom: 4.5,
+        center: [7.312, 62.2583],
+        zoom: 9.5,
         pitch: DEFAULT_PITCH,
       });
 
