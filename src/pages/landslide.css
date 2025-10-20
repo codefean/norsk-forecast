@@ -1,0 +1,105 @@
+/* landslides.css
+   Enhanced popup layout with responsive 2x2 stat grid and scroll behavior
+*/
+
+@import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+.landslide-popup .mapboxgl-popup-content {
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: white;
+  padding: 12px 14px;
+  font-family: "Inter", sans-serif;
+  width: 280px;
+  max-height: 450px;
+  overflow-y: auto;
+  border-left: 5px solid transparent; /* default */
+}
+
+/* Outline colors by risk level */
+.landslide-popup.high-risk .mapboxgl-popup-content,
+.landslide-label.high-risk {
+  border-left-color: #d73027;
+}
+
+.landslide-popup.moderate-risk .mapboxgl-popup-content,
+.landslide-label.moderate-risk {
+  border-left-color: #fc8d59;
+}
+
+.landslide-popup.low-risk .mapboxgl-popup-content,
+.landslide-label.low-risk {
+  border-left-color: #fee090;
+}
+
+.landslide-popup.historical-event .mapboxgl-popup-content,
+.landslide-label.historical-event {
+  border-left-color: #000000;
+}
+
+.landslide-popup .mapboxgl-popup-content h4 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.landslide-popup .mapboxgl-popup-content p {
+  font-size: 0.9rem;
+  line-height: 1.2;
+  margin: 3px 0;
+  color: #eee;
+}
+
+/* --- Stats box grid --- */
+.landslide-popup .stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+.landslide-popup .stats div {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: left;
+  min-width: 0;
+}
+
+.landslide-popup .stats div strong {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+/* Popup scroll styling */
+.landslide-popup .mapboxgl-popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+.landslide-popup .mapboxgl-popup-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.landslide-popup .mapboxgl-popup-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Popup tip & divider */
+.landslide-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(0, 0, 0, 0.6) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.landslide-popup hr {
+  border: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+}

@@ -29,7 +29,7 @@
 .place-marker {
   width: 9px;
   height: 9px;
-  background-color: red;
+  background-color: rgb(179, 0, 255);
   border: 1px solid white;
   /* square so we don't add border-radius */
 }

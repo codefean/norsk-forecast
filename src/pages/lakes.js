@@ -42,6 +42,9 @@ export function useLakeLayer({ mapRef }) {
             "line-color": "blue",
             "line-width": 1.5,
           },
+            layout: {
+    visibility: "none", // ✅ ensures hidden at startup
+  },
         });
       }
     };
@@ -76,6 +79,7 @@ export function useLakeLayer({ mapRef }) {
             lakes.forEach(({ lat, lon, glof, glof_years, id }) => {
               const el = document.createElement("div");
               el.className = glof ? "place-marker" : "marker circle";
+              el.style.display = "none";
 
               const marker = new mapboxgl.Marker(el, { anchor: "center" })
                 .setLngLat([lon, lat])

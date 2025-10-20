@@ -80,6 +80,41 @@
   white-space: normal;
 }
 
+/* 100-Year Zone (deep red) */
+.hazard-100 {
+  width: 12px;
+  height: 12px;
+  background-color: #d73027;
+  border: 1px solid #ffffffcc;
+  border-radius: 2px;
+}
+
+/* 1000-Year Zone (orange) */
+.hazard-1000 {
+  width: 12px;
+  height: 12px;
+  background-color: #fc8d59;
+  border: 1px solid #ffffffcc;
+  border-radius: 2px;
+}
+
+/* 5000-Year Zone (yellow) */
+.hazard-5000 {
+  width: 12px;
+  height: 12px;
+  background-color: #fee090;
+  border: 1px solid #ffffffcc;
+  border-radius: 2px;
+}
+
+/* Hover effect for hazard legend squares */
+.map-legend-square.hazard-100:hover,
+.map-legend-square.hazard-1000:hover,
+.map-legend-square.hazard-5000:hover {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
+}
+
 /* ===========================
    ICON BASE STYLES
 =========================== */
@@ -126,6 +161,14 @@
   width: 12px;
   height: 12px;
   background-color: #87cefa; /* light blue */
+  border: none !important;
+  border-radius: 50%;
+}
+
+.historical-event {
+  width: 12px;
+  height: 12px;
+  background-color: #f781bf; /* light blue */
   border: none !important;
   border-radius: 50%;
 }

@@ -11,7 +11,7 @@ const Citation = ({ stylePos }) => {
         RGI Consortium (2023) — Randolph Glacier Inventory v7.0.{" "}
       </div>
       <div>
-        Norwegian Meteorological Institute (2025) — Frost API.{" "}
+        Norwegian Meteorological Institute (2025){" "}
       </div>
       <div>
         Norwegian Water Resources and Energy Directorate (NVE) (2025){" "}

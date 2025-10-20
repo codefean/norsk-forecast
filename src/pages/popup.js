@@ -27,33 +27,17 @@ const BetaPopup = ({ loading, progress, title }) => {
       aria-labelledby="scandi-popup-title"
     >
       <div className="scandi-popup-box">
-        <h2 id="scandi-popup-title">Norsk Glacier Forecast</h2>
-
+        <h2 id="scandi-popup-title">Norsk Landslide Forecast</h2>
         <p className="popup-text">
-          An interactive platform for exploring glaciers and glacial lakes across
-          Scandinavia. <strong>Click on glaciers</strong> to see their predicted
-          weather data and explore nearby glacial lakes.
-        </p>
-
-        <p className="popup-text">
-          Weather data is pulled from Norwegian Meteorological Institute
-          stations located within 12&nbsp;km of each glacier. A{" "}
-          <em>temperature-index glacier melt model with temperature adjustments</em>{" "}
-          then predicts melt rates and near-surface glacier temperatures.
-        </p>
-
-        <p className="popup-text">
-          This website is currently in <strong>beta</strong> and serves as a
-          concept for making cryospheric data more accessible and interactive.
-          The models and calculations are still being refined.
+          En interaktiv plattform som formidler informasjon om steinskred- og jordskredrisiko i Norge.
+          Dette nettstedet er for øyeblikket i <strong>beta</strong> og viser kun data fra Møre og Romsdal-regionen. 
+          Det fungerer som et konsept for å gjøre skredrisikodata mer tilgjengelige og interaktive.
         </p>
 
         <p className="popup-text small">
-          Created by <strong>Sean Fagan</strong>, as a
-          portfolio project for PhD applications. Still being developed and
-          improved.
+          Laget av <strong>Sean Fagan</strong>, som et porteføljeprosjekt for PhD-søknader. 
+          Nettstedet er fortsatt under utvikling og forbedres fortløpende. Dataene er hentet fra NVE.
         </p>
-
         {/* Loading area */}
         {loading ? (
           <>
