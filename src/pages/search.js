@@ -130,7 +130,7 @@ const SearchBar = ({ mapRef }) => {
       const data = await res.json();
       if (data.features?.length > 0) {
         const [lon, lat] = data.features[0].center;
-        map.flyTo({ center: [lon, lat], zoom: 12, speed: 2 });
+        map.flyTo({ center: [lon, lat], zoom: 13.3, speed: 2 });
         return;
       }
     } catch (err) {

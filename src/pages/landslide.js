@@ -10,7 +10,7 @@ export const landslideTileset100 = {
   sourceLayer: "hazard_zone_100_v",
   sourceId: "hazard_zone_100_v",
   color: "#d73027",
-  opacity: 0.6,
+  opacity: 0.5,
   label: "Høy risikosone",
 };
 
@@ -19,7 +19,7 @@ export const landslideTileset100_v = {
   sourceLayer: "hazard_zone_100",
   sourceId: "landslide_hazard_100",
   color: "#d73027",
-  opacity: 0.6,
+  opacity: 0.5,
   label: "Høy risikosone",
 };
 
