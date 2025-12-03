@@ -19,7 +19,7 @@ import { useLandslideLayer } from "./landslide";
 //
 
 mapboxgl.accessToken =
-  "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
+  "pk.eyJ1IjoibWFwZmVhbjIiLCJhIjoiY21pcW15czFtMDBwMjNkcTVnMGhhYjR5dyJ9.VgAM8pGsqn--nTvsiWn9NQ";
 
 const WeatherStationsMap = () => {
   const mapContainer = useRef(null);
