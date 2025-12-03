@@ -4,7 +4,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { useGlacierLayer } from "./glaciers";
 import Loc from "./loc";
-import Citation from "./citation";
 import "./weatherMap.css";
 import PitchControl from "./PitchControl";
 import SearchBar from "./search";
@@ -185,7 +184,6 @@ const WeatherStationsMap = () => {
       <PitchControl mapRef={mapRef} value={pitch} onChange={(p) => setPitch(p)} />
       <SearchBar mapRef={mapRef} />
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
-      <Citation className="citation-readout" stylePos={{}} />
       <Hotkey resetZoom={resetZoom} />
       <MapLegend />
       <BetaPopup loading={loading} progress={progress} title="Loading Data..." />
