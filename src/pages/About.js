@@ -19,13 +19,12 @@ const About = () => {
         </p>
         <p> 
           Any input or assistance is greatly appreciated. Please reach out to{" "}
-          <a href="mailto:sfagan2@alaska.edu">sfagan2@alaska.edu</a>.
+          <a href="mailto:sean.fagan@su.se">sean.fagan@su.se</a>.
         </p>
         <p>
-          This website was created by <strong>Sean Fagan</strong> between Oct 19
-          – Oct 21st, 2025 as a portfolio project. Sean is currently applying for
-          PhD positions related to hazards and climate change while doing work
-          on glacial lake outburst floods at the University of Alaska.
+          This website was created by <strong>Sean Fagan</strong> as a portfolio project. Sean is currently applying for
+          PhD positions while doing work on glacial lake outburst floods at the University of Alaska and researching social-ecological 
+          regime shifts at Stockholm Resilience Centre. 
         </p>
       </div>
 
