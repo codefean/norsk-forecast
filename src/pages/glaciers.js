@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "./glaciers.css";
+import { placeMode } from "./placeMode";
 
 export const glacierTileset = {
   url: "mapbox://mapfean.bmdn0gwv",
@@ -160,6 +161,7 @@ export function useGlacierLayer({ mapRef }) {
       }
 
       map.on("click", [FILL_LAYER_ID_1, FILL_LAYER_ID_2], async (e) => {
+        if (placeMode.active) return;
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
         });
@@ -208,6 +210,7 @@ export function useGlacierLayer({ mapRef }) {
       });
 
       map.on("click", (e) => {
+        if (placeMode.active) return;
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
         });

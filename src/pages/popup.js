@@ -27,16 +27,27 @@ const BetaPopup = ({ loading, progress, title }) => {
       aria-labelledby="scandi-popup-title"
     >
       <div className="scandi-popup-box">
-        <h2 id="scandi-popup-title">Norsk Landslide Forecast</h2>
+        <h2 id="scandi-popup-title">Norsk Landslide Map</h2>
+        <p className="popup-subtitle">Landslide hazard explorer · Beta</p>
+
         <p className="popup-text">
-          En interaktiv plattform som formidler informasjon om steinskred- og jordskredrisiko i Norge.
-          Dette nettstedet er for øyeblikket i <strong>beta</strong> og viser kun data fra Møre og Romsdal-regionen. 
-          Det fungerer som et konsept for å gjøre skredrisikodata mer tilgjengelige og interaktive.
+          This map shows where landslides and rockfalls can reach in{" "}
+          <strong>Møre og Romsdal</strong>: NVE hazard zones with an annual
+          probability of 1/100, 1/1000 and 1/5000, together with registered
+          landslide events.
+        </p>
+
+        <p className="popup-text">
+          <strong>New:</strong> mark the places you depend on, such as a clinic,
+          school, ferry quay or detour route, and see whether they sit inside a
+          hazard zone. This is a prototype for participatory mapping of the
+          everyday infrastructure that landslides can cut off.
         </p>
 
         <p className="popup-text small">
-          Laget av <strong>Sean Fagan</strong>, som et porteføljeprosjekt for PhD-søknader. 
-          Nettstedet er fortsatt under utvikling og forbedres fortløpende. Dataene er hentet fra NVE.
+          Data: NVE Skredfaresoner (pre-2026 version) and NVE Skredhendelser.
+          Read hazard zones together with NVE's reports; this map is not for
+          planning decisions. Made by Sean Fagan.
         </p>
         {/* Loading area */}
         {loading ? (
@@ -55,7 +66,7 @@ const BetaPopup = ({ loading, progress, title }) => {
             className="scandi-popup-close-button"
             onClick={handleClose}
           >
-            <strong>OK</strong>
+            <strong>Explore the map</strong>
           </button>
         )}
       </div>

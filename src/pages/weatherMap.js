@@ -13,6 +13,7 @@ import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
 import { useLandslideLayer } from "./landslide";
+import MarkPlaces from "./MarkPlaces";
 import { MAPBOX_TOKEN } from "../config";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -90,6 +91,8 @@ const LandslideMap = () => {
         center: DEFAULT_CENTER,
         zoom: DEFAULT_ZOOM,
         pitch: DEFAULT_PITCH,
+        customAttribution:
+          "Hazard data: NVE Skredfaresoner (pre-2026 version) and Skredhendelser. Not for planning decisions.",
       });
 
       await new Promise((resolve) => mapRef.current.on("load", resolve));
@@ -176,9 +179,10 @@ const LandslideMap = () => {
       <Loc cursorInfo={cursorInfo} className="loc-readout" />
       <Hotkey resetZoom={resetZoom} />
       <MapLegend />
-      <BetaPopup loading={loading} progress={progress} title="Loading Data..." />
+      <BetaPopup loading={loading} progress={progress} title="Loading map data…" />
 
       <LayersToggle showLakes={showLakes} setShowLakes={setShowLakes} />
+      <MarkPlaces mapRef={mapRef} ready={!loading} />
     </div>
   );
 };

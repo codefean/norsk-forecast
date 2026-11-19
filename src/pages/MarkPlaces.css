@@ -1,0 +1,178 @@
+.mark-places {
+  position: fixed;
+  top: 55px;
+  right: 15px;
+  width: 270px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.85rem;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.mark-places-header {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.mark-places-body {
+  padding: 0 14px 12px;
+}
+
+.mark-places-intro {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.mark-places-primary {
+  background: #fff;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mark-places-primary:hover {
+  background: #e6e6e6;
+}
+
+.mark-places-link {
+  background: none;
+  border: none;
+  color: #9fd8ff;
+  padding: 0;
+  margin-left: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.mark-places-actions .mark-places-link:first-child {
+  margin-left: 0;
+}
+
+.mark-places-actions .mark-places-primary + .mark-places-link {
+  margin-left: 12px;
+}
+
+.mark-places-hint {
+  padding: 6px 0;
+  font-style: italic;
+}
+
+.mark-places-cats {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.mark-places-cats label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mark-places-cats label.selected {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mark-places-cats input {
+  display: none;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  flex: none;
+}
+
+.mark-places-form input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: none;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.mark-places-summary {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mark-places-summary p {
+  margin: 0 0 4px;
+}
+
+.place-hazard {
+  margin: 4px 0 8px;
+  font-size: 0.8rem;
+  color: #ffd27a;
+}
+
+.mark-places-note {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.35;
+}
+
+.place-pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.place-popup {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  max-width: 220px;
+}
+
+.place-popup p {
+  margin: 4px 0;
+}
+
+.place-popup .place-hazard {
+  color: #a35b00;
+}
+
+.place-remove {
+  margin-top: 4px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 844px) {
+  .mark-places {
+    top: auto;
+    bottom: 70px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+}

@@ -40,7 +40,7 @@ const Header = () => {
 
 <div className="header-title">
   <h1>
-    Norsk Landslide Forecast <span className="beta-text">| Beta</span>
+    Norsk Landslide Map <span className="beta-text">| Beta</span>
   </h1>
 </div>
     </header>

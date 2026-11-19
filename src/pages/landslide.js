@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "./landslide.css";
+import { placeMode } from "./placeMode";
 
 // NVE hazard datasets (Mapbox tilesets). Zones are nested: 1/5000 contains
 // 1/1000, which contains 1/100.
@@ -173,6 +174,7 @@ const statBox = (label, value) => {
 };
 
       const showPopup = (e, isClick = false) => {
+        if (placeMode.active) return;
         const features = map.queryRenderedFeatures(e.point, {
           layers: tilesets.map((t) => t.sourceId),
         });

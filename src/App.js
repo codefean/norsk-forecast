@@ -15,12 +15,12 @@ const useDocumentTitle = (title) => {
 };
 
 const MapPage = () => {
-  useDocumentTitle("Norsk Landslide Forecast");
+  useDocumentTitle("Norsk Landslide Map – Landslide hazard explorer");
   return <LandslideMap />;
 };
 
 const AboutPage = () => {
-  useDocumentTitle("About · Norsk Landslide Forecast");
+  useDocumentTitle("About · Norsk Landslide Map");
   return <About />;
 };
 

@@ -7,15 +7,25 @@ const About = () => {
       <h1 className="about-title">About</h1>
       <div className="about-content">
         <p>
-          <strong>Norsk Landslide Forecast</strong> is a lightweight, interactive
-          platform designed to help you explore landslide and glacial hazards
-          across Norway.  
+          <strong>Norsk Landslide Map</strong> is a lightweight, interactive
+          platform for exploring landslide hazard in Norway. It shows NVE hazard
+          zones and registered landslide events, and lets visitors mark the
+          places they depend on, such as clinics, schools, ferry quays and detour
+          routes, to see which of them sit inside a hazard zone.  
         </p>
 
         <p>
-          This website is currently in <strong>beta</strong> and serves as a
-          concept to showcase how rock avalanche, landslide, and glacial data can be made more accessible and
-          interactive.  
+          This website is currently in <strong>beta</strong> and covers Møre og
+          Romsdal. It is a concept for making hazard data more accessible, and a
+          prototype for participatory mapping: combining official hazard maps
+          with local knowledge of which roads, services and places communities
+          cannot do without. Marked places are stored only in your own browser.
+        </p>
+        <p>
+          Hazard zones come from the NVE Skredfaresoner dataset (pre-2026
+          version), which NVE has since replaced with "Faresonekart for skred i
+          bratt terreng". Hazard zones should be read together with NVE's
+          reports, and this map is not suitable for planning decisions.
         </p>
         <p> 
           Any input or assistance is greatly appreciated. Please reach out to{" "}
