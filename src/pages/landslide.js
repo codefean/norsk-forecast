@@ -2,17 +2,9 @@ import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "./landslide.css";
 
-// NVE hazard datasets (Mapbox tilesets)
+// NVE hazard datasets (Mapbox tilesets). Zones are nested: 1/5000 contains
+// 1/1000, which contains 1/100.
 export const landslideTileset100 = {
-  url: "mapbox://mapfean.93jc9gj8",
-  sourceLayer: "hazard_zone_100_v",
-  sourceId: "hazard_zone_100_v",
-  color: "#d73027",
-  opacity: 0.5,
-  label: "Høy risikosone",
-};
-
-export const landslideTileset100_v = {
   url: "mapbox://mapfean.93jc9gj8",
   sourceLayer: "hazard_zone_100",
   sourceId: "landslide_hazard_100",
@@ -30,28 +22,10 @@ export const landslideTileset1000 = {
   label: "Moderat risikosone",
 };
 
-export const landslideTileset1000_v = {
-  url: "mapbox://mapfean.djpd346u",
-  sourceLayer: "hazard_zone_1000_v",
-  sourceId: "hazard_zone_1000_v",
-  color: "#fc8d59",
-  opacity: 0.4,
-  label: "Moderat risikosone",
-};
-
 export const landslideTileset5000 = {
   url: "mapbox://mapfean.08wlzd44",
   sourceLayer: "hazard_zone_5000",
   sourceId: "landslide_hazard_5000",
-  color: "#fee090",
-  opacity: 0.4,
-  label: "Lav risikosone",
-};
-
-export const landslideTileset5000_v = {
-  url: "mapbox://mapfean.9e4ypxph",
-  sourceLayer: "hazard_zone_5000_v",
-  sourceId: "hazard_zone_5000_v",
   color: "#fee090",
   opacity: 0.4,
   label: "Lav risikosone",
@@ -68,17 +42,6 @@ export const historicalEvents = {
     "NVE Skredhendelser – registrerte snøskred, steinsprang, jordskred og flomskredhendelser.",
 };
 
-export const historicalEvents_v = {
-  url: "mapbox://mapfean.cmnr4xfd",
-  sourceLayer: "avalanche_event_v",
-  sourceId: "avalanche_event_v",
-  color: "#f781bf",
-  opacity: 1.0,
-  label: "Historiske hendelser",
-  description:
-    "NVE Skredhendelser – registrerte snøskred, steinsprang, jordskred og flomskredhendelser.",
-};
-
 export function useLandslideLayer({ mapRef }) {
   useEffect(() => {
     const map = mapRef?.current;
@@ -86,18 +49,13 @@ export function useLandslideLayer({ mapRef }) {
 
     let clickPopup = null;
 
+    // Lowest hazard first so the 1/100 zone is drawn on top
     const tilesets = [
-  landslideTileset100,
-  landslideTileset1000,
-  landslideTileset5000,
-  historicalEvents,
-
-  // Regional variants (_v)
-  landslideTileset100_v,
-  landslideTileset1000_v,
-  landslideTileset5000_v,
-  historicalEvents_v,
-];
+      landslideTileset5000,
+      landslideTileset1000,
+      landslideTileset100,
+      historicalEvents,
+    ];
 
     // Colour by NVE skredType
     const typeMap = {
