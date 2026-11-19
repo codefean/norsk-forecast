@@ -13,7 +13,7 @@ const BetaPopup = ({ loading, progress, title }) => {
   }, [loading]);
 
   const handleClose = () => {
-    if (loading) return; // block until finished
+    if (loading) return;
     setVisible(false);
   };
 

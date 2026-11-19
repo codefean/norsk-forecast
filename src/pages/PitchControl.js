@@ -6,7 +6,7 @@ const PitchControl = forwardRef(
     const handlePitchChange = (e) => {
       const newPitch = parseInt(e.target.value, 10);
       if (mapRef.current) mapRef.current.setPitch(newPitch);
-      if (onChange) onChange(newPitch); // tell parent to update its pitch state
+      if (onChange) onChange(newPitch);
     };
 
     return (
@@ -18,7 +18,7 @@ const PitchControl = forwardRef(
           min={min}
           max={max}
           step={step}
-          value={Math.round(Number(value) || 0)} // CONTROLLED value
+          value={Math.round(Number(value) || 0)}
           onChange={handlePitchChange}
         />
       </div>

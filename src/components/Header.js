@@ -9,7 +9,6 @@ const Header = () => {
 
   return (
     <header className="header">
-      {/* Mobile hamburger */}
       <button
         className="menu-toggle"
         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -18,7 +17,6 @@ const Header = () => {
         {isMenuOpen ? "✖" : "☰"}
       </button>
 
-      {/* Nav links */}
       <nav className={`nav-links ${isMenuOpen ? "open" : ""}`}>
         <NavLink
           to="/weatherMap"
@@ -40,7 +38,6 @@ const Header = () => {
         </NavLink>
       </nav>
 
-      {/* Title centered */}
 <div className="header-title">
   <h1>
     Norsk Landslide Forecast <span className="beta-text">| Beta</span>

@@ -1,13 +1,8 @@
-// search.js
 import React, { useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "./search-bar.css";
 
-// ✅ Mapbox token
-mapboxgl.accessToken =
-  "pk.eyJ1IjoibWFwZmVhbiIsImEiOiJjbTNuOGVvN3cxMGxsMmpzNThzc2s3cTJzIn0.1uhX17BCYd65SeQsW1yibA";
-
-// ✅ Glacier sources present in the map style (must match your map.addSource IDs)
+// Vector sources added by useGlacierLayer
 const GLACIER_SOURCES = [
   { sourceID: "glaciers_scandi", sourceLayer: "scandi_glaciers2" },
   { sourceID: "glaciers_svalbard", sourceLayer: "svallbard_glaciers2" },
@@ -17,7 +12,6 @@ const SearchBar = ({ mapRef }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
-  // --- utils ---------------------------------------------------------------
 
   const labelFor = (props = {}) =>
     props.glac_name || props.GLAC_NAME || props.name || props.glims_id || "Unknown glacier";
@@ -97,7 +91,6 @@ const SearchBar = ({ mapRef }) => {
     return Array.from(byKey.values());
   };
 
-  // --- main actions --------------------------------------------------------
 
   const handleSearch = async () => {
     const map = mapRef.current;
@@ -106,7 +99,7 @@ const SearchBar = ({ mapRef }) => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return;
 
-    // 1) Try glacier match
+    // Glacier name/ID first
     const all = dedupeGlaciers(queryAllGlacierFeatures(map));
     const glacier = all
       .filter((f) => rankMatches(f.properties || {}, q) < 6)
@@ -120,7 +113,7 @@ const SearchBar = ({ mapRef }) => {
       }
     }
 
-    // 2) Fallback: address search (NO/SE)
+    // Otherwise geocode the address (Norway/Sweden)
     try {
       const res = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
@@ -202,7 +195,6 @@ const SearchBar = ({ mapRef }) => {
     setSuggestions([...glacierMatches, ...addressMatches]);
   };
 
-  // --- ui ------------------------------------------------------------------
 
   return (
     <div className="search-bar-container">

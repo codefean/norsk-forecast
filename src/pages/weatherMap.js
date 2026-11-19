@@ -13,21 +13,20 @@ import MapLegend from "./MapLegend";
 import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
 import { useLandslideLayer } from "./landslide";
+import { MAPBOX_TOKEN } from "../config";
 
-// cd /Users/seanfagan/Desktop/norsk-forecast
-//
+mapboxgl.accessToken = MAPBOX_TOKEN;
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoibWFwZmVhbjIiLCJhIjoiY21pcW15czFtMDBwMjNkcTVnMGhhYjR5dyJ9.VgAM8pGsqn--nTvsiWn9NQ";
+const DEFAULT_CENTER = [7.312, 62.2583];
+const DEFAULT_ZOOM = 9.5;
+const DEFAULT_PITCH = 20;
 
-const WeatherStationsMap = () => {
+const LandslideMap = () => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
 
-  const DEFAULT_PITCH = 20;
   const [pitch, setPitch] = useState(DEFAULT_PITCH);
   const [loading, setLoading] = useState(true);
-  const [, setLogMessages] = useState([]);
   const [progress, setProgress] = useState(0);
   const [showLakes, setShowLakes] = useState(false);
   const [cursorInfo, setCursorInfo] = useState({
@@ -36,11 +35,7 @@ const WeatherStationsMap = () => {
     elevM: null,
   });
 
-  
-
-  const updateProgress = (msg, step, totalSteps) => {
-    console.log(msg);
-    setLogMessages((prev) => [...prev, msg]);
+  const updateProgress = (step, totalSteps) => {
     setProgress(Math.round((step / totalSteps) * 100));
   };
 
@@ -48,15 +43,15 @@ const WeatherStationsMap = () => {
     const map = mapRef.current;
     if (!map) return;
     map.flyTo({
-      center: [7.312, 62.2583],
-        zoom: 9.5,
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
       speed: 2.2,
       pitch: DEFAULT_PITCH,
     });
     setPitch(DEFAULT_PITCH);
   };
 
-  // Reset zoom on “R”
+  // "R" resets the view
   useEffect(() => {
     const handleKeydown = (e) => {
       if (e.key.toLowerCase() === "r") resetZoom();
@@ -80,7 +75,6 @@ const WeatherStationsMap = () => {
     };
   }, []);
 
-  // Initialize Map
   useEffect(() => {
     const initMap = async () => {
       if (mapRef.current) return;
@@ -88,20 +82,19 @@ const WeatherStationsMap = () => {
       const totalSteps = 4;
       let step = 1;
 
-      updateProgress("Initializing Mapbox map...", step++, totalSteps);
+      updateProgress(step++, totalSteps);
 
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
-        center: [7.312, 62.2583],
-        zoom: 9.5,
+        center: DEFAULT_CENTER,
+        zoom: DEFAULT_ZOOM,
         pitch: DEFAULT_PITCH,
       });
 
       await new Promise((resolve) => mapRef.current.on("load", resolve));
-      updateProgress("Mapbox map fully loaded", step++, totalSteps);
+      updateProgress(step++, totalSteps);
 
-      // Terrain DEM
       if (!mapRef.current.getSource("mapbox-dem")) {
         mapRef.current.addSource("mapbox-dem", {
           type: "raster-dem",
@@ -112,7 +105,6 @@ const WeatherStationsMap = () => {
         mapRef.current.setTerrain({ source: "mapbox-dem", exaggeration: 1.0 });
       }
 
-      // Cursor elevation
       mapRef.current.on("mousemove", (e) => {
         const { lng, lat } = e.lngLat;
         const elevation = mapRef.current.queryTerrainElevation(e.lngLat, {
@@ -145,7 +137,6 @@ const WeatherStationsMap = () => {
     };
   }, []);
 
-  // Toggle lakes visibility
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -164,7 +155,6 @@ const WeatherStationsMap = () => {
     });
   }, [showLakes]);
 
-  // Always mount glaciers + lakes
   useGlacierLayer({ mapRef });
   useLakeLayer({ mapRef, show: showLakes, visibility: "none" });
   useLandslideLayer({ mapRef });
@@ -193,4 +183,4 @@ const WeatherStationsMap = () => {
   );
 };
 
-export default WeatherStationsMap;
+export default LandslideMap;

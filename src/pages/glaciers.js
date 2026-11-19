@@ -159,7 +159,6 @@ export function useGlacierLayer({ mapRef }) {
         });
       }
 
-      // 🔹 Handle click popups (simplified – no station info)
       map.on("click", [FILL_LAYER_ID_1, FILL_LAYER_ID_2], async (e) => {
         const features = map.queryRenderedFeatures(e.point, {
           layers: [FILL_LAYER_ID_1, FILL_LAYER_ID_2],
@@ -182,7 +181,6 @@ export function useGlacierLayer({ mapRef }) {
             ? `${parseInt(props.zmax_m, 10)} m`
             : "N/A";
 
-        // Remove existing click popup if open
         if (clickPopup) {
           clickPopup.remove();
           clickPopup = null;

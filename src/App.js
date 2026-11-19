@@ -1,29 +1,26 @@
-// src/App.js
 import React from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
-import WeatherMap from "./pages/weatherMap";
+import LandslideMap from "./pages/weatherMap";
 import About from "./pages/About";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 import "./App.css";
 
-// Custom hook for setting the document title
 const useDocumentTitle = (title) => {
   React.useEffect(() => {
     document.title = title;
   }, [title]);
 };
 
-// Page wrappers to handle title updates
-const WeatherMapPage = () => {
+const MapPage = () => {
   useDocumentTitle("Norsk Landslide Forecast");
-  return <WeatherMap />;
+  return <LandslideMap />;
 };
 
 const AboutPage = () => {
-  useDocumentTitle("About");
+  useDocumentTitle("About · Norsk Landslide Forecast");
   return <About />;
 };
 
@@ -34,13 +31,11 @@ const App = () => {
         <Header />
         <main className="main-content">
           <Routes>
-            {/* Default home route */}
-            <Route path="/" element={<WeatherMapPage />} />
-            <Route path="/norsk-forecast" element={<WeatherMapPage />} />
-            <Route path="/weatherMap" element={<WeatherMapPage />} />
+            <Route path="/" element={<MapPage />} />
+            <Route path="/norsk-forecast" element={<MapPage />} />
+            <Route path="/weatherMap" element={<MapPage />} />
             <Route path="/about" element={<AboutPage />} />
-            {/* Fallback for 404 */}
-            <Route path="*" element={<WeatherMapPage />} />
+            <Route path="*" element={<MapPage />} />
           </Routes>
         </main>
         <Footer />
