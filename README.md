@@ -10,6 +10,7 @@ The site is in beta and currently covers Møre og Romsdal. It is a concept for m
 
 - Mark places you depend on (clinic, school, ferry quay, alternative route, ...) and see whether they fall inside an NVE hazard zone; pins are stored only in the browser and can be downloaded as GeoJSON
 - NVE hazard zones and historical landslide events, coloured by slide type, with popups for each feature
+- Main roads, ferry links (NVDB via Kartverket) and railway lines (Bane NOR) over the hazard zones
 - Glacier outlines and glacial lakes with recorded outburst floods (toggle)
 - 3D terrain with adjustable pitch and live elevation readout
 - Search by place name or glacier
@@ -19,6 +20,7 @@ The site is in beta and currently covers Møre og Romsdal. It is a concept for m
 - NVE Skredfaresoner (pre-2026 version; since replaced by "Faresonekart for skred i bratt terreng") and the national landslide database (Skredhendelser)
 - Andreassen et al. (2022), inventory of Norway's glaciers and ice-marginal lakes, *Journal of Glaciology* 68(272)
 - RGI Consortium (2023), Randolph Glacier Inventory v7.0
+- Kartverket Vegnett2 WMS (NVDB road network) and Bane NOR Jernbane – Banenettverk WMS, both under NLOD
 
 Hazard and glacier layers are served as Mapbox vector tilesets; lake centroids are loaded from `public/GLO_2019_WGS84.csv`.
 

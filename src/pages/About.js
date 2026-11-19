@@ -70,6 +70,21 @@ const About = () => {
           </a>
         </div>
         <div>
+          Kartverket / Statens vegvesen — Vegnett2 WMS (road network from the
+          National Road Database, NVDB).{" "}
+          <a
+            href="https://kartkatalog.geonorge.no/metadata/vegnett2-wms/302fcb0e-a7dc-44f4-a336-8c9ee9709d73"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Geonorge
+          </a>
+        </div>
+        <div>
+          Inneheld data under Norsk lisens for offentlige data (NLOD) gjort
+          tilgjengeleg av Bane NOR SF — Jernbane - Banenettverk.
+        </div>
+        <div>
           Norwegian Water Resources and Energy Directorate (NVE) (2025) — Map Services{" "}
           <a
             href="http://nve.no/map-services/"

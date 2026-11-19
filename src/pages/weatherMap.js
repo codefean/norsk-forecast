@@ -14,6 +14,7 @@ import LayersToggle from "./LayersToggle";
 import BetaPopup from "./popup";
 import { useLandslideLayer } from "./landslide";
 import MarkPlaces from "./MarkPlaces";
+import { useTransportLayers } from "./transport";
 import { MAPBOX_TOKEN } from "../config";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -30,6 +31,10 @@ const LandslideMap = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showLakes, setShowLakes] = useState(false);
+  const [transport, setTransport] = useState({
+    "roads-nvdb": true,
+    "rail-banenor": true,
+  });
   const [cursorInfo, setCursorInfo] = useState({
     lat: null,
     lng: null,
@@ -161,6 +166,7 @@ const LandslideMap = () => {
   useGlacierLayer({ mapRef });
   useLakeLayer({ mapRef, show: showLakes, visibility: "none" });
   useLandslideLayer({ mapRef });
+  useTransportLayers({ mapRef, visible: transport });
 
   return (
     <div style={{ position: "relative" }}>
@@ -181,7 +187,12 @@ const LandslideMap = () => {
       <MapLegend />
       <BetaPopup loading={loading} progress={progress} title="Loading map data…" />
 
-      <LayersToggle showLakes={showLakes} setShowLakes={setShowLakes} />
+      <LayersToggle
+        showLakes={showLakes}
+        setShowLakes={setShowLakes}
+        transport={transport}
+        setTransport={setTransport}
+      />
       <MarkPlaces mapRef={mapRef} ready={!loading} />
     </div>
   );
