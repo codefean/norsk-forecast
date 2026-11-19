@@ -29,7 +29,6 @@ const About = () => {
       </div>
 
 
-      {/* Citations Section */}
       <div className="about-citations">
         <h2>Citations</h2>
         <div>
@@ -50,16 +49,6 @@ const About = () => {
           </a>
         </div>
         <div>
-          Norwegian Meteorological Institute (2025){" "}
-          <a
-            href="https://frost.met.no/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://frost.met.no/
-          </a>
-        </div>
-        <div>
           Norwegian Water Resources and Energy Directorate (NVE) (2025) — Glacial
           lake outburst flood (GLOF) page.{" "}
           <a
@@ -70,7 +59,7 @@ const About = () => {
             https://glacier.nve.no/Glacier/viewer/GLOF/en/
           </a>
         </div>
-                <div>
+        <div>
           Norwegian Water Resources and Energy Directorate (NVE) (2025) — Map Services{" "}
           <a
             href="http://nve.no/map-services/"

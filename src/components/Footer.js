@@ -5,7 +5,6 @@ const Footer = () => {
   return (
     <footer className="footer">
 
-      {/* Footer Text */}
       <p>
         The{" "}
         <a

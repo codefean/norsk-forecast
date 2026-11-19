@@ -1,16 +1,15 @@
-// lakes.js
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import Papa from "papaparse";
 import "./lakes.css";
 
-// ✅ Lake CSV (centroids, with GLOF + years)
+// Lake centroids with GLOF history
 export const LAKE_CSV_URL = `${process.env.PUBLIC_URL}/GLO_2019_WGS84.csv`;
 
-// ✅ Lake tileset config (Mapbox polygons for outlines)
+// Lake outline polygons
 export const lakeTileset = {
-  url: "mapbox://mapfean.64gel3ni", // your Mapbox tileset ID
-  sourceLayer: "GLO_2019_WGS84",    // must match Mapbox Studio layer name
+  url: "mapbox://mapfean.64gel3ni",
+  sourceLayer: "GLO_2019_WGS84",
   sourceId: "GLO_2019_WGS84",
 };
 
@@ -23,7 +22,6 @@ export function useLakeLayer({ mapRef }) {
     const map = mapRef?.current;
     if (!map) return;
 
-    // --- Add lake outlines only ---
     const addTileset = () => {
       if (!map.getSource(lakeTileset.sourceId)) {
         map.addSource(lakeTileset.sourceId, {
@@ -43,13 +41,12 @@ export function useLakeLayer({ mapRef }) {
             "line-width": 1.5,
           },
             layout: {
-    visibility: "none", // ✅ ensures hidden at startup
+    visibility: "none",
   },
         });
       }
     };
 
-    // --- Add lake centroid markers from CSV ---
     const addCentroidMarkers = async () => {
       try {
         const response = await fetch(LAKE_CSV_URL);
@@ -67,15 +64,13 @@ export function useLakeLayer({ mapRef }) {
                 lat: parseFloat(row.centroid_lat),
                 lon: parseFloat(row.centroid_lon),
                 glof: String(row.GLOF).toLowerCase() === "true",
-                glof_years: row.glof_years, // expects CSV column "glof_years"
+                glof_years: row.glof_years,
               }))
               .filter((lake) => !isNaN(lake.lat) && !isNaN(lake.lon));
 
-            // Remove old markers
             markersRef.current.forEach((m) => m.remove());
             markersRef.current = [];
 
-            // Add markers
             lakes.forEach(({ lat, lon, glof, glof_years, id }) => {
               const el = document.createElement("div");
               el.className = glof ? "place-marker" : "marker circle";
@@ -88,7 +83,6 @@ export function useLakeLayer({ mapRef }) {
               markersRef.current.push(marker);
 
               if (glof) {
-                // ✅ Build popup content
                 const popupContent = document.createElement("div");
                 popupContent.className = "glacier-popup";
                 popupContent.innerHTML = `
@@ -115,7 +109,6 @@ export function useLakeLayer({ mapRef }) {
                   offset: 12,
                 }).setDOMContent(popupContent);
 
-                // Show popup on hover
                 el.addEventListener("mouseenter", () => {
                   popup.setLngLat([lon, lat]).addTo(map);
                 });
@@ -124,7 +117,6 @@ export function useLakeLayer({ mapRef }) {
                 });
               }
 
-              // ✅ Fly to lake on click (all markers)
               el.addEventListener("click", (e) => {
                 e.stopPropagation();
                 map.flyTo({

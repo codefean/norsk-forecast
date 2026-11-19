@@ -2,9 +2,7 @@ import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "./landslide.css";
 
-// ===============================
-// DATASETS
-// ===============================
+// NVE hazard datasets (Mapbox tilesets)
 export const landslideTileset100 = {
   url: "mapbox://mapfean.93jc9gj8",
   sourceLayer: "hazard_zone_100_v",
@@ -81,9 +79,6 @@ export const historicalEvents_v = {
     "NVE Skredhendelser – registrerte snøskred, steinsprang, jordskred og flomskredhendelser.",
 };
 
-// ===============================
-// MAP HOOK
-// ===============================
 export function useLandslideLayer({ mapRef }) {
   useEffect(() => {
     const map = mapRef?.current;
@@ -92,33 +87,32 @@ export function useLandslideLayer({ mapRef }) {
     let clickPopup = null;
 
     const tilesets = [
-  // Main
   landslideTileset100,
   landslideTileset1000,
   landslideTileset5000,
   historicalEvents,
 
-  // Regional (_v)
+  // Regional variants (_v)
   landslideTileset100_v,
   landslideTileset1000_v,
   landslideTileset5000_v,
   historicalEvents_v,
 ];
 
-    // Norwegian skredType mapping
+    // Colour by NVE skredType
     const typeMap = {
-      // 🪨 Steinskred / Fjellskred / Steinsprang
+      // Steinskred / fjellskred / steinsprang
       110: "Steinskred, uspesifisert",
       111: "Steinsprang",
       112: "Steinskred",
       113: "Fjellskred",
 
-      // 🌊 Undervann / teknisk
+      // Undervann / teknisk
       120: "Undervannsskred",
       160: "Utglidning av veg",
       171: "Bygningskollaps / teknisk konstruksjon",
 
-      // 🌧️ Jord-, leire- og flomskred
+      // Jord-, leire- og flomskred
       121: "Jordskred",
       122: "Flomskred",
       123: "Leirskred",
@@ -132,7 +126,7 @@ export function useLandslideLayer({ mapRef }) {
       143: "Kvikkleireskred",
       144: "Jordskred",
 
-      // ❄️ Snøskred og is
+      // Snøskred og is
       130: "Snøskred, uspesifisert",
       133: "Sørpeskred",
       134: "Løssnøskred, uspesifisert",
@@ -144,7 +138,7 @@ export function useLandslideLayer({ mapRef }) {
       150: "Isnedfall",
       151: "Is-/snøras fra tak",
 
-      // 🌋 Annet / ukjent
+      // Annet / ukjent
       190: "Ikke angitt",
       199: "Annen / ny skredtype",
       300: "Ukjent skredtype",
@@ -180,7 +174,7 @@ const addHazardLayer = ({ url, sourceId, sourceLayer, color, opacity }) => {
           },
     };
 
-    // ✅ Add filter for historical events only (landslide, rockfall, slope failures)
+    // Historical events: only landslide, rockfall and slope-failure types
     if (isPoints) {
       layerConfig.filter = [
         "in",
@@ -204,7 +198,6 @@ const addHazardLayer = ({ url, sourceId, sourceLayer, color, opacity }) => {
         className: "landslide-popup",
       });
 
-      // Helper for building conditional stat boxes
 const statBox = (label, value) => {
   if (
     !value ||
@@ -221,7 +214,6 @@ const statBox = (label, value) => {
   return `<div><strong>${label}:</strong> ${value}</div>`;
 };
 
-      // Unified popup renderer
       const showPopup = (e, isClick = false) => {
         const features = map.queryRenderedFeatures(e.point, {
           layers: tilesets.map((t) => t.sourceId),
@@ -296,7 +288,6 @@ const statBox = (label, value) => {
           riskClass = "historical-event";
         }
 
-        // Render popup
         const popupHTML = `
           <div class="landslide-label ${riskClass}">
             <h4>${label}</h4>

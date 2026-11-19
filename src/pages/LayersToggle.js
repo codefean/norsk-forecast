@@ -1,4 +1,3 @@
-// src/LayersToggle.js
 import React from "react";
 import "./LayersToggle.css";
 

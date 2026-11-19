@@ -1,4 +1,3 @@
-// src/pages/loc.js
 import React from "react";
 import './loc.css';
 
